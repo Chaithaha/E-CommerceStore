@@ -4,6 +4,7 @@ import { toggleDarkMode } from '../utils/darkMode';
 import apiClient from '../utils/apiClient';
 import LoadingSpinner from './common/LoadingSpinner';
 import ErrorMessage from './common/ErrorMessage';
+import Header from './Header';
 import '../NewLandingPage.css';
 
 const LandingPage = () => {
@@ -66,19 +67,6 @@ const LandingPage = () => {
       }
   };
 
-  const handleSignIn = () => {
-    navigate('/login');
-  };
-
-  const handleSignUp = () => {
-    navigate('/signup');
-  };
-
-  const handleToggleDarkMode = () => {
-    const newMode = toggleDarkMode();
-    setIsDarkMode(newMode);
-  };
-
   const handleViewDetails = (productId) => {
     navigate(`/product/${productId}`);
   };
@@ -92,62 +80,8 @@ const LandingPage = () => {
   return (
     <div className="landing-page">
       <div className="layout-container">
-        {/* Header */}
-        <header className="header">
-          <div className="header-content">
-            <div className="header-main">
-              <div className="logo-section">
-                <span className="material-symbols-outlined logo-icon">
-                  devices
-                </span>
-                <h2 className="logo-text">Refurbished</h2>
-              </div>
-              <div className="nav-section">
-                <div className="nav-links">
-                  <a href="/categories">Shop by Category</a>
-                  <a href="/how-it-works">How it Works</a>
-                  <a href="/about">About Us</a>
-                </div>
-              </div>
-              <div className="action-buttons">
-                <button
-                  className="btn btn-primary"
-                  onClick={handleSignIn}
-                >
-                  <span>Sign In</span>
-                </button>
-                <button
-                  className="btn btn-secondary"
-                  onClick={handleSignUp}
-                >
-                  <span>Sign Up</span>
-                </button>
-                <button className="btn-icon">
-                  <span className="material-symbols-outlined">
-                    shopping_cart
-                  </span>
-                </button>
-                <button
-                  className="btn-icon"
-                  onClick={handleToggleDarkMode}
-                >
-                  <span className="material-symbols-outlined">
-                    {isDarkMode ? 'light_mode' : 'dark_mode'}
-                  </span>
-                </button>
-              </div>
-            </div>
-          </div>
-      </header>
-
-      {/* Banner */}
-      <div className="banner">
-        <div className="banner-content">
-          <p className="banner-text">
-            Verified Sellers | 💯 Diagnostic Reports | 📉 E-Waste Reduced: 1,234,567 lbs
-          </p>
-        </div>
-      </div>
+        {/* Header Component */}
+        <Header isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />
 
         {/* Main Content */}
         <main className="main-content">
