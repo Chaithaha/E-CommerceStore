@@ -103,7 +103,7 @@ const LandingPage = () => {
             <div className="hero">
               <div className="hero-content">
                 <h1 className="hero-title">
-                  Refurbished. Verified. Transparent.
+                  ForOranges. Verified. Transparent.
                 </h1>
                 <h2 className="hero-subtitle">
                   The Marketplace Where Diagnostics Aren't Optional.
