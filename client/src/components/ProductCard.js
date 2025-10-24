@@ -1,7 +1,14 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { imageService } from "../utils/imageService";
+import {
+  getProductImageUrl,
+  getBatteryHealthColor,
+  getBatteryHealthLabel,
+  getStockStatus,
+} from "../utils/productUtils";
+import Button from "./common/Button";
 import "./ProductCard.css";
+import "../styles/common.css";
 
 const ProductCard = ({ product, onViewDetails }) => {
   const navigate = useNavigate();
@@ -10,39 +17,8 @@ const ProductCard = ({ product, onViewDetails }) => {
   const [imageUrl, setImageUrl] = React.useState(null);
 
   React.useEffect(() => {
-    // Determine the best image URL to use
-    const getImageUrl = async () => {
-      try {
-        // If product has a direct image_url (legacy support)
-        if (product.image_url) {
-          return product.image_url;
-        }
-
-        // If product has images array, use the first one
-        if (product.images && product.images.length > 0) {
-          const firstImage = product.images[0];
-          if (firstImage.publicUrl) {
-            return firstImage.publicUrl;
-          }
-          if (firstImage.image_url) {
-            return firstImage.image_url;
-          }
-          // If we have storage path, generate public URL
-          if (firstImage.storage_path) {
-            return imageService.getPublicUrl(firstImage.storage_path);
-          }
-        }
-
-        // Fallback to null - let the component handle missing images
-        return null;
-      } catch (error) {
-        console.error("Error getting image URL:", error);
-        return null;
-      }
-    };
-
     const loadImageUrl = async () => {
-      const url = await getImageUrl();
+      const url = await getProductImageUrl(product);
       setImageUrl(url);
     };
 
@@ -69,27 +45,6 @@ const ProductCard = ({ product, onViewDetails }) => {
     } else {
       navigate(`/product/${product.id}`);
     }
-  };
-
-  const getBatteryHealthColor = (health) => {
-    if (health >= 90) return "battery-health-good";
-    if (health >= 80) return "battery-health-medium";
-    return "battery-health-poor";
-  };
-
-  const getBatteryHealthLabel = (health) => {
-    if (health >= 90) return "Excellent";
-    if (health >= 80) return "Good";
-    if (health >= 70) return "Fair";
-    return "Poor";
-  };
-
-  const getStockStatus = () => {
-    // You can customize this logic based on your product data
-    const stock = product.stock || 1;
-    if (stock <= 3) return `Only ${stock} left in stock!`;
-    if (stock <= 10) return `${stock} available`;
-    return "In stock";
   };
 
   return (
@@ -125,10 +80,7 @@ const ProductCard = ({ product, onViewDetails }) => {
           <div className="product-category">
             {product.category || "Electronics"}
           </div>
-          <div className="product-title-container">
-            <h3 className="product-title">{product.title}</h3>
-            <div className="product-title-arrow">→</div>
-          </div>
+          <h3 className="product-title">{product.title}</h3>
         </div>
 
         <div className="product-price-section">
@@ -141,8 +93,6 @@ const ProductCard = ({ product, onViewDetails }) => {
             </div>
           )}
         </div>
-
-        <div className="product-stock">{getStockStatus()}</div>
 
         <div className="product-details">
           <div className="product-detail-item">
@@ -169,12 +119,14 @@ const ProductCard = ({ product, onViewDetails }) => {
       </div>
 
       <div className="product-actions">
-        <button
-          className="btn btn-primary view-details-btn"
+        <Button
+          variant="primary"
+          size="large"
+          fullWidth
           onClick={handleViewDetails}
         >
           View Details
-        </button>
+        </Button>
       </div>
     </div>
   );
