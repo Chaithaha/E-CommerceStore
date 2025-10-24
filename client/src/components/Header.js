@@ -1,7 +1,10 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { toggleDarkMode } from "../utils/darkMode";
+import Button from "./common/Button";
+import IconButton from "./common/IconButton";
 import "./Header.css";
+import "../styles/common.css";
 
 const Header = ({
   isDarkMode,
@@ -25,9 +28,14 @@ const Header = ({
     navigate("/create-post");
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     if (onLogout) {
-      onLogout();
+      try {
+        await onLogout();
+      } catch (error) {
+        console.error("Logout failed:", error);
+        // Still navigate even if logout fails
+      }
     }
     navigate("/");
   };
@@ -42,10 +50,30 @@ const Header = ({
     setIsDropdownOpen(false);
   };
 
-  const handleLogoutClick = () => {
-    handleLogout();
+  const handleLogoutClick = async () => {
+    await handleLogout();
     closeDropdown();
   };
+
+  // Handle dropdown item clicks to prevent blur from closing dropdown first
+  const handleDropdownItemClick = async (handler) => {
+    if (handler) {
+      await handler();
+    }
+    closeDropdown();
+  };
+
+  // Close dropdown when clicking outside
+  React.useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (isDropdownOpen && !event.target.closest(".user-dropdown")) {
+        closeDropdown();
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isDropdownOpen]);
 
   const handleToggleDarkMode = () => {
     const newMode = toggleDarkMode();
@@ -70,11 +98,7 @@ const Header = ({
             // Authenticated user UI
             <>
               <div className="user-dropdown">
-                <button
-                  className="dropdown-trigger"
-                  onClick={toggleDropdown}
-                  onBlur={closeDropdown}
-                >
+                <button className="dropdown-trigger" onClick={toggleDropdown}>
                   <span className="material-symbols-outlined user-icon">
                     account_circle
                   </span>
@@ -88,7 +112,7 @@ const Header = ({
                   <div className="dropdown-menu">
                     <button
                       className="dropdown-item"
-                      onClick={handleCreatePost}
+                      onClick={() => handleDropdownItemClick(handleCreatePost)}
                     >
                       <span className="material-symbols-outlined">
                         add_circle
@@ -97,7 +121,7 @@ const Header = ({
                     </button>
                     <button
                       className="dropdown-item logout-item"
-                      onClick={handleLogoutClick}
+                      onClick={() => handleDropdownItemClick(handleLogoutClick)}
                     >
                       <span className="material-symbols-outlined">logout</span>
                       <span>Logout</span>
@@ -106,31 +130,26 @@ const Header = ({
                 )}
               </div>
 
-              <button className="btn-icon" onClick={handleToggleDarkMode}>
+              <IconButton onClick={handleToggleDarkMode}>
                 <span className="material-symbols-outlined">
                   {isDarkMode ? "light_mode" : "dark_mode"}
                 </span>
-              </button>
+              </IconButton>
             </>
           ) : (
             // Unauthenticated user UI
             <>
-              <button className="btn btn-primary" onClick={handleSignIn}>
-                <span>Sign In</span>
-              </button>
-              <button className="btn btn-secondary" onClick={handleSignUp}>
-                <span>Sign Up</span>
-              </button>
-              <button className="btn btn-icon" onClick={handleToggleDarkMode}>
+              <Button variant="primary" onClick={handleSignIn}>
+                Sign In
+              </Button>
+              <Button variant="secondary" onClick={handleSignUp}>
+                Sign Up
+              </Button>
+              <IconButton onClick={handleToggleDarkMode}>
                 <span className="material-symbols-outlined">
                   {isDarkMode ? "light_mode" : "dark_mode"}
                 </span>
-              </button>
-              <button className="btn-icon" onClick={handleToggleDarkMode}>
-                <span className="material-symbols-outlined">
-                  {isDarkMode ? "light_mode" : "dark_mode"}
-                </span>
-              </button>
+              </IconButton>
             </>
           )}
         </div>

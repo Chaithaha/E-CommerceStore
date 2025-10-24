@@ -4,7 +4,6 @@ import {
   getProductImageUrl,
   getBatteryHealthColor,
   getBatteryHealthLabel,
-  getStockStatus,
 } from "../utils/productUtils";
 import Button from "./common/Button";
 import "./ProductCard.css";

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -6,7 +6,6 @@ import {
   Navigate,
 } from "react-router-dom";
 import { useAuth, AuthProvider } from "./contexts/AuthContext";
-import apiClient from "./utils/apiClient";
 import LoadingSpinner from "./components/common/LoadingSpinner";
 // Removed unused ErrorMessage import
 import ErrorBoundary from "./components/common/ErrorBoundary";
@@ -21,7 +20,7 @@ import ProtectedRoute from "./components/auth/ProtectedRoute";
 import "./App.css";
 
 function AppContent() {
-  const { user, loading, error } = useAuth();
+  const { loading, error } = useAuth();
 
   // Show loading spinner while checking auth state
   if (loading) {
