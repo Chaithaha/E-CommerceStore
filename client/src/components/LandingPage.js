@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { toggleDarkMode } from "../utils/darkMode";
+import { useAuth } from "../contexts/AuthContext";
+
 import apiClient from "../utils/apiClient";
 import LoadingSpinner from "./common/LoadingSpinner";
 import ErrorMessage from "./common/ErrorMessage";
@@ -8,7 +9,7 @@ import Header from "./Header";
 import "../NewLandingPage.css";
 
 const LandingPage = () => {
-  // Auth info not required here
+  const { user, isAuthenticated, getDisplayName, logout } = useAuth();
   const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -86,7 +87,14 @@ const LandingPage = () => {
     <div className="landing-page">
       <div className="layout-container">
         {/* Header Component */}
-        <Header isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />
+        <Header
+          isDarkMode={isDarkMode}
+          setIsDarkMode={setIsDarkMode}
+          isAuthenticated={isAuthenticated}
+          user={user}
+          username={getDisplayName()}
+          onLogout={logout}
+        />
 
         {/* Main Content */}
         <main className="main-content">

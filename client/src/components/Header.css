@@ -170,6 +170,28 @@
   gap: 0.5rem;
 }
 
+.user-welcome {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background-color: var(--mui-surface);
+  border-radius: var(--mui-border-radius);
+  border: 1px solid var(--mui-divider);
+  margin-right: 0.5rem;
+}
+
+.welcome-text {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--mui-text-primary);
+  white-space: nowrap;
+}
+
+.dark .user-welcome {
+  background-color: var(--mui-surface);
+  border-color: var(--mui-divider);
+}
+
 .btn {
   display: flex;
   min-width: 5.25rem;
