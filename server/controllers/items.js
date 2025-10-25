@@ -76,19 +76,34 @@ const createItem = async (req, res) => {
 
             for (const fileData of images) {
                 try {
+                    console.log(`Processing file: ${fileData.originalname}, size: ${fileData.size}`);
+                    
                     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
                     const ext = path.extname(fileData.originalname);
                     const filename = `item-${newItem.id}-${uniqueSuffix}${ext}`;
                     const storagePath = `${newItem.id}/${filename}`;
 
+                    // Log base64 data size
                     const base64Data = fileData.base64.replace(/^data:image\/\w+;base64,/, '');
+                    console.log(`Base64 data length: ${base64Data.length} characters`);
+                    
                     const buffer = Buffer.from(base64Data, 'base64');
+                    console.log(`Buffer size: ${buffer.length} bytes`);
 
+                    // Check buffer size before processing
+                    if (buffer.length > 25 * 1024 * 1024) { // 25MB check
+                        throw new Error(`Image buffer too large: ${buffer.length} bytes`);
+                    }
+
+                    console.log('Starting Sharp compression...');
                     const compressedBuffer = await sharp(buffer)
                         .resize(1920, 1920, { fit: 'inside', withoutEnlargement: true })
                         .jpeg({ quality: 80 })
                         .toBuffer();
+                    
+                    console.log(`Compressed buffer size: ${compressedBuffer.length} bytes`);
 
+                    console.log('Starting Supabase upload...');
                     const { error: uploadError } = await supabase.storage
                         .from('item-images')
                         .upload(storagePath, compressedBuffer, {
@@ -97,15 +112,19 @@ const createItem = async (req, res) => {
                         });
 
                     if (uploadError) {
+                        console.error('Supabase upload error:', uploadError);
                         throw uploadError;
                     }
 
+                    console.log('Supabase upload successful, generating public URL...');
                     const { data: publicUrlData } = supabase.storage
                         .from('item-images')
                         .getPublicUrl(storagePath);
                     
                     const imageUrl = publicUrlData.publicUrl;
+                    console.log(`Generated public URL: ${imageUrl}`);
 
+                    console.log('Storing image metadata in database...');
                     const { data: imageRecord, error: dbError } = await supabase
                         .from('item_images')
                         .insert({
@@ -121,6 +140,7 @@ const createItem = async (req, res) => {
                         .single();
 
                     if (dbError) {
+                        console.error('Database insert error:', dbError);
                         throw dbError;
                     }
 
@@ -131,6 +151,8 @@ const createItem = async (req, res) => {
                         original_filename: fileData.originalname,
                         storage_path: storagePath
                     });
+
+                    console.log(`Successfully processed image: ${fileData.originalname}`);
 
                 } catch (fileError) {
                     console.error('Error processing file:', fileData.originalname, fileError);
@@ -181,8 +203,21 @@ const createItem = async (req, res) => {
         res.status(201).json(createdItem);
 
     } catch (err) {
-        console.error('Server error:', err);
-        res.status(500).json({ error: 'Internal server error' });
+        console.error('Server error details:', {
+            message: err.message,
+            stack: err.stack,
+            code: err.code,
+            status: err.status,
+            body: req.body ? {
+                hasImages: !!req.body.images,
+                imageCount: req.body.images ? req.body.images.length : 0,
+                totalSize: req.body.images ? req.body.images.reduce((sum, img) => sum + (img.size || 0), 0) : 0
+            } : 'No body'
+        });
+        res.status(500).json({ 
+            error: 'Internal server error',
+            details: err.message 
+        });
     }
 };
 

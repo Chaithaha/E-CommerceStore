@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import LoadingSpinner from "./common/LoadingSpinner";
 import ErrorMessage from "./common/ErrorMessage";
@@ -10,6 +10,7 @@ import "../NewLandingPage.css";
 
 const HomePage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, isAuthenticated, logout } = useAuth();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -30,7 +31,7 @@ const HomePage = () => {
     );
   }, []);
 
-  // Fetch products when component mounts - using direct fetch to avoid auth issues
+  // Fetch products when component mounts, when page gains focus, or when location changes
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -39,30 +40,78 @@ const HomePage = () => {
 
         const API_URL =
           process.env.REACT_APP_API_URL || "http://localhost:5000";
-        const response = await fetch(`${API_URL}/api/items`, {
+        const url = `${API_URL}/api/items`;
+
+        console.log("Fetching products from:", url);
+
+        const response = await fetch(url, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
           },
         });
 
-        const data = await response.json();
+        console.log("Response status:", response.status);
+        console.log("Response ok:", response.ok);
 
-        if (response.ok) {
-          setProducts(data);
-        } else {
-          setError(data.error || "Failed to fetch products");
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error("Error response:", errorText);
+          throw new Error(`HTTP ${response.status}: ${errorText}`);
         }
+
+        const data = await response.json();
+        console.log("Fetched products:", data.length);
+
+        setProducts(data);
       } catch (err) {
         console.error("Fetch error:", err);
-        setError("Network error. Please try again later.");
+        setError(err.message || "Network error. Please try again later.");
       } finally {
         setLoading(false);
       }
     };
 
     fetchProducts();
-  }, []);
+
+    // Add event listener for when page gains focus (e.g., navigating back from create post)
+    const handleFocus = () => {
+      fetchProducts();
+    };
+
+    window.addEventListener("focus", handleFocus);
+
+    return () => {
+      window.removeEventListener("focus", handleFocus);
+    };
+  }, [location.key]); // Add location.key as dependency to refresh on navigation
+
+  const refreshProducts = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+      const response = await fetch(`${API_URL}/api/items`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setProducts(data);
+      } else {
+        setError(data.error || "Failed to fetch products");
+      }
+    } catch (err) {
+      setError("Network error. Please try again later.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSearch = async (e) => {
     e.preventDefault();
@@ -133,7 +182,7 @@ const HomePage = () => {
             <div className="hero">
               <div className="hero-content">
                 {/* Authentication Status Display */}
-                {isAuthenticated && (
+                {isAuthenticated ? (
                   <div
                     style={{
                       backgroundColor: "#4CAF50",
@@ -145,7 +194,21 @@ const HomePage = () => {
                       textAlign: "center",
                     }}
                   >
-                    ✅ Authenticated as: {user?.email}
+                    ✅ Authenticated as: {user?.email || user?.name || "User"}
+                  </div>
+                ) : (
+                  <div
+                    style={{
+                      backgroundColor: "#f44336",
+                      color: "white",
+                      padding: "8px 16px",
+                      borderRadius: "4px",
+                      marginBottom: "16px",
+                      fontSize: "14px",
+                      textAlign: "center",
+                    }}
+                  >
+                    ⚠️ Not authenticated - Please log in to create posts
                   </div>
                 )}
 
@@ -189,6 +252,17 @@ const HomePage = () => {
 
             {/* Products Section */}
             <div className="products-section">
+              <div className="products-header">
+                <h2>Latest Listings</h2>
+                <button
+                  onClick={refreshProducts}
+                  className="refresh-btn"
+                  disabled={loading}
+                >
+                  <span className="material-symbols-outlined">refresh</span>
+                  Refresh
+                </button>
+              </div>
               <div className="products-grid">
                 {loading ? (
                   <div className="loading-container">

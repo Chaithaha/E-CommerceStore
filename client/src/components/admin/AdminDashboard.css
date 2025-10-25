@@ -1,11 +1,79 @@
 /* Admin Dashboard CSS Variables */
 :root {
+  /* Background Colors */
   --background-light: #ffffff;
   --background-dark: #0f172a;
   --bg-card: #ffffff;
+  --bg-dark-192633: #192633;
+
+  /* Border Colors */
   --border-color: #e5e7eb;
+  --border-dark: #324d67;
+  --border-gray-300: #d1d5db;
+
+  /* Text Colors */
   --text-primary: #1f2937;
   --text-secondary: #6b7280;
+  --text-white: #ffffff;
+
+  /* Primary Colors */
+  --primary: #1173d4;
+  --primary-dark: #0d5bb8;
+
+  /* Status Colors */
+  --success: #28a745;
+  --success-hover: #218838;
+  --danger: #dc3545;
+  --danger-hover: #c82333;
+  --warning: #f59e0b;
+  --info: #007bff;
+  --info-hover: #0056b3;
+
+  /* Background Variants */
+  --bg-gray-50: #f9fafb;
+  --bg-gray-100: #f3f4f6;
+  --bg-gray-200: #e5e7eb;
+  --bg-dark-233648: #233648;
+  --bg-dark-2f465c: #2f465c;
+
+  /* Border Radius */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg:
+    0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+
+  /* Transitions */
+  --transition-normal: 0.2s ease;
+
+  /* Typography */
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+  --font-size-4xl: 2.25rem;
+
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-black: 900;
+
+  --line-height-relaxed: 1.625;
+
+  /* Z-index */
+  --z-sticky: 100;
+  --z-dropdown: 1000;
 }
 
 .admin-dashboard {

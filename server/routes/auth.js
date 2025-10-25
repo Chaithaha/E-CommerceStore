@@ -75,20 +75,6 @@ if (error) {
         console.error('Error bypassing email confirmation:', confirmError);
       }
     }
-    
-    // Create user profile
-    const { error: profileError } = await supabaseService
-      .from('profiles')
-      .insert({
-        id: data.user.id,
-        full_name: full_name || email.split('@')[0],
-        role: 'user'
-      });
-    
-    if (profileError) {
-      console.error('Profile creation error:', profileError);
-      // Don't return error here as user was created in auth
-    }
 
     // Manually confirm the user email for testing
     try {

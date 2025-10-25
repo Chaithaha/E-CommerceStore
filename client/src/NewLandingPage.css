@@ -672,3 +672,59 @@ main {
 .product-card {
   transition: all 0.2s ease-in-out;
 }
+
+/* Products Header */
+.products-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.products-header h2 {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: var(--text-gray-900);
+  margin: 0;
+}
+
+.dark .products-header h2 {
+  color: var(--text-gray-100);
+}
+
+/* Refresh Button */
+.refresh-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: var(--primary);
+  color: var(--text-white);
+  border: none;
+  border-radius: var(--radius-lg);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.refresh-btn:hover:not(:disabled) {
+  background: var(--primary-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.refresh-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.refresh-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.refresh-btn .material-symbols-outlined {
+  font-size: 1.125rem;
+}

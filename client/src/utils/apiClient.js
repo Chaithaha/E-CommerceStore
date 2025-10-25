@@ -6,7 +6,6 @@ const getAuthToken = () => {
     // First check for server authentication token (highest priority)
     const serverToken = localStorage.getItem("access_token");
     if (serverToken) {
-      console.log("Found server token:", serverToken.substring(0, 20) + "...");
       return serverToken;
     }
 
@@ -24,35 +23,21 @@ const getAuthToken = () => {
           const parsedToken = JSON.parse(token);
           // Try different possible structures for the access token
           if (parsedToken?.currentSession?.access_token) {
-            console.log(
-              `Found token from ${key}:`,
-              parsedToken.currentSession.access_token.substring(0, 20) + "...",
-            );
             return parsedToken.currentSession.access_token;
           }
           if (parsedToken?.access_token) {
-            console.log(
-              `Found token from ${key}:`,
-              parsedToken.access_token.substring(0, 20) + "...",
-            );
             return parsedToken.access_token;
           }
           if (parsedToken?.session?.access_token) {
-            console.log(
-              `Found token from ${key}:`,
-              parsedToken.session.access_token.substring(0, 20) + "...",
-            );
             return parsedToken.session.access_token;
           }
         } catch (parseError) {
-          console.log(`Failed to parse token from ${key}:`, parseError);
+          // Continue to next key if parsing fails
         }
       }
     }
-
-    console.log("No auth token found in localStorage");
   } catch (error) {
-    console.error("Error getting auth token:", error);
+    // Silently handle errors
   }
   return null;
 };
@@ -103,6 +88,7 @@ const apiClient = {
         headers,
         body: JSON.stringify(data),
       });
+
       const responseData = await response.json();
       return {
         success: response.ok,

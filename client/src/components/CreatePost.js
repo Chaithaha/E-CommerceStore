@@ -8,7 +8,14 @@ import "./CreatePost.css";
 
 const CreatePost = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
+
+  // Redirect if not authenticated
+  React.useEffect(() => {
+    if (!isAuthenticated) {
+      navigate("/home");
+    }
+  }, [isAuthenticated, navigate]);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -52,8 +59,8 @@ const CreatePost = () => {
         );
         return false;
       }
-      if (file.size > 5 * 1024 * 1024) {
-        setError(`File too large: ${file.name}. Maximum size is 5MB.`);
+      if (file.size > 20 * 1024 * 1024) {
+        setError(`File too large: ${file.name}. Maximum size is 20MB.`);
         return false;
       }
       return true;
@@ -77,6 +84,13 @@ const CreatePost = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Check if user is authenticated
+    if (!isAuthenticated || !user) {
+      setError("You must be logged in to create a post");
+      return;
+    }
+
     setError("");
     setLoading(true);
 
@@ -123,6 +137,7 @@ const CreatePost = () => {
         setError(response.error || "Failed to create post");
       }
     } catch (err) {
+      console.error("Post creation error:", err);
       setError(err.message || "Failed to create post");
     } finally {
       setLoading(false);

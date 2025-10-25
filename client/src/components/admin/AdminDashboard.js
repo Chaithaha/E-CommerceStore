@@ -13,14 +13,13 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState("user-items");
   const [users, setUsers] = useState([]);
-  const [activeUsers, setActiveUsers] = useState([]);
-  const [myItems, setMyItems] = useState([]);
+
   const [userItems, setUserItems] = useState([]);
+  const [allPosts, setAllPosts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [showActiveOnly, setShowActiveOnly] = useState(false);
 
   // Initialize dark mode state
   useEffect(() => {
@@ -51,16 +50,6 @@ const AdminDashboard = () => {
           console.error("Failed to fetch users:", usersResponse.error);
         }
 
-        // Fetch admin's own items
-        const myItemsResponse = await apiClient.get(
-          `/api/items?user_id=${user.id}`,
-        );
-        if (myItemsResponse.success) {
-          setMyItems(myItemsResponse.data);
-        } else {
-          console.error("Failed to fetch admin items:", myItemsResponse.error);
-        }
-
         // Fetch all user items (excluding admin's own items)
         const userItemsResponse = await apiClient.get(
           "/api/items?status=pending",
@@ -73,15 +62,12 @@ const AdminDashboard = () => {
           console.error("Failed to fetch user items:", userItemsResponse.error);
         }
 
-        // Fetch active users
-        const activeUsersResponse = await apiClient.get("/api/users/active");
-        if (activeUsersResponse.success) {
-          setActiveUsers(activeUsersResponse.data);
+        // Fetch all posts for management
+        const allPostsResponse = await apiClient.get("/api/items");
+        if (allPostsResponse.success) {
+          setAllPosts(allPostsResponse.data);
         } else {
-          console.error(
-            "Failed to fetch active users:",
-            activeUsersResponse.error,
-          );
+          console.error("Failed to fetch all posts:", allPostsResponse.error);
         }
       } catch (err) {
         setError("Failed to load dashboard data");
@@ -96,24 +82,28 @@ const AdminDashboard = () => {
 
   const filteredUsers = users.filter((user) => {
     const matchesSearch =
-      user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesActiveFilter = !showActiveOnly || user.status === "online";
-    return matchesSearch && matchesActiveFilter;
+      (user.email || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (user.name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (user.username || "").toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesSearch;
   });
-
-  const filteredMyItems = myItems.filter(
-    (item) =>
-      item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.category.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
 
   const filteredUserItems = userItems.filter(
     (item) =>
-      item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.category.toLowerCase().includes(searchTerm.toLowerCase()),
+      (item.title || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (item.description || "")
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      (item.category || "").toLowerCase().includes(searchTerm.toLowerCase()),
+  );
+
+  const filteredAllPosts = allPosts.filter(
+    (item) =>
+      (item.title || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (item.description || "")
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      (item.category || "").toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   const handleUserAction = async (userId, action) => {
@@ -182,14 +172,6 @@ const AdminDashboard = () => {
 
   const refreshItems = async () => {
     try {
-      // Refresh admin's items
-      const myItemsResponse = await apiClient.get(
-        `/api/items?user_id=${user.id}`,
-      );
-      if (myItemsResponse.success) {
-        setMyItems(myItemsResponse.data);
-      }
-
       // Refresh user items
       const userItemsResponse = await apiClient.get(
         "/api/items?status=pending",
@@ -199,39 +181,19 @@ const AdminDashboard = () => {
           userItemsResponse.data.filter((item) => item.user?.id !== user.id),
         );
       }
+
+      // Refresh all posts
+      const allPostsResponse = await apiClient.get("/api/items");
+      if (allPostsResponse.success) {
+        setAllPosts(allPostsResponse.data);
+      }
     } catch (err) {
       console.error("Error refreshing items:", err);
     }
   };
 
-  const refreshUserStatus = async () => {
-    try {
-      // Refresh all users
-      const usersResponse = await apiClient.get("/api/users");
-      if (usersResponse.success) {
-        setUsers(usersResponse.data);
-      }
-
-      // Refresh active users
-      const activeUsersResponse = await apiClient.get("/api/users/active");
-      if (activeUsersResponse.success) {
-        setActiveUsers(activeUsersResponse.data);
-      }
-    } catch (err) {
-      console.error("Error refreshing user status:", err);
-    }
-  };
-
-  // Set up periodic refresh for user status (every 2 minutes)
-  useEffect(() => {
-    if (isAdmin() && activeTab === "users") {
-      const interval = setInterval(refreshUserStatus, 2 * 60 * 1000);
-      return () => clearInterval(interval);
-    }
-  }, [isAdmin, activeTab]);
-
   const handleCreateItem = () => {
-    navigate("/create-item");
+    navigate("/create-post");
   };
 
   if (loading) {
@@ -274,15 +236,7 @@ const AdminDashboard = () => {
                   <p className="stat-label">Total Users</p>
                 </div>
               </div>
-              <div className="stat-card">
-                <div className="stat-icon">
-                  <span className="material-symbols-outlined">inventory_2</span>
-                </div>
-                <div className="stat-content">
-                  <h3 className="stat-number">{myItems.length}</h3>
-                  <p className="stat-label">My Items</p>
-                </div>
-              </div>
+
               <div className="stat-card">
                 <div className="stat-icon">
                   <span className="material-symbols-outlined">
@@ -294,31 +248,33 @@ const AdminDashboard = () => {
                   <p className="stat-label">Pending Approval</p>
                 </div>
               </div>
+              <div className="stat-card">
+                <div className="stat-icon">
+                  <span className="material-symbols-outlined">inventory</span>
+                </div>
+                <div className="stat-content">
+                  <h3 className="stat-number">{allPosts.length}</h3>
+                  <p className="stat-label">Total Posts</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
         <div className="dashboard-tabs">
           <button
-            className={`tab-button ${activeTab === "overview" ? "active" : ""}`}
-            onClick={() => setActiveTab("overview")}
-          >
-            <span className="material-symbols-outlined">dashboard</span>
-            Overview
-          </button>
-          <button
-            className={`tab-button ${activeTab === "my-items" ? "active" : ""}`}
-            onClick={() => setActiveTab("my-items")}
-          >
-            <span className="material-symbols-outlined">inventory_2</span>
-            My Items ({myItems.length})
-          </button>
-          <button
             className={`tab-button ${activeTab === "user-items" ? "active" : ""}`}
             onClick={() => setActiveTab("user-items")}
           >
             <span className="material-symbols-outlined">public</span>
             Community Items ({userItems.length})
+          </button>
+          <button
+            className={`tab-button ${activeTab === "all-posts" ? "active" : ""}`}
+            onClick={() => setActiveTab("all-posts")}
+          >
+            <span className="material-symbols-outlined">inventory</span>
+            All Posts ({allPosts.length})
           </button>
           <button
             className={`tab-button ${activeTab === "users" ? "active" : ""}`}
@@ -344,129 +300,6 @@ const AdminDashboard = () => {
               />
             </div>
           </div>
-
-          {activeTab === "overview" && (
-            <div className="overview-section">
-              <div className="overview-header">
-                <h2 className="overview-title">Dashboard Overview</h2>
-                <p className="overview-subtitle">
-                  Quick access to your most important admin functions
-                </p>
-              </div>
-              <div className="overview-grid">
-                <div className="overview-card">
-                  <div className="overview-card-header">
-                    <span className="material-symbols-outlined overview-card-icon">
-                      add_circle
-                    </span>
-                    <h3>Quick Actions</h3>
-                  </div>
-                  <div className="overview-card-content">
-                    <Button
-                      onClick={handleCreateItem}
-                      variant="primary"
-                      fullWidth
-                    >
-                      <span className="material-symbols-outlined">add</span>
-                      Create New Item
-                    </Button>
-                  </div>
-                </div>
-                <div className="overview-card">
-                  <div className="overview-card-header">
-                    <span className="material-symbols-outlined overview-card-icon">
-                      activity
-                    </span>
-                    <h3>Recent Activity</h3>
-                  </div>
-                  <div className="overview-card-content">
-                    <p>Recent items and user activity will appear here</p>
-                  </div>
-                </div>
-                <div className="overview-card">
-                  <div className="overview-card-header">
-                    <span className="material-symbols-outlined overview-card-icon">
-                      trending_up
-                    </span>
-                    <h3>Analytics</h3>
-                  </div>
-                  <div className="overview-card-content">
-                    <p>View detailed analytics and insights</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {activeTab === "my-items" && (
-            <div className="my-items-section">
-              <div className="section-header">
-                <div className="section-title">
-                  <h2>My Items</h2>
-                  <p>Manage your own marketplace listings</p>
-                </div>
-                <Button onClick={handleCreateItem} variant="primary">
-                  <span className="material-symbols-outlined">add</span>
-                  Create New Item
-                </Button>
-              </div>
-              <div className="items-table">
-                {filteredMyItems.length === 0 ? (
-                  <p>No items found. Create your first item!</p>
-                ) : (
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Title</th>
-                        <th>Category</th>
-                        <th>Price</th>
-                        <th>Status</th>
-                        <th>Created</th>
-                        <th>Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredMyItems.map((item) => (
-                        <tr key={item.id}>
-                          <td>{item.title}</td>
-                          <td>{item.category}</td>
-                          <td>${item.price}</td>
-                          <td>
-                            <span className={`status-badge ${item.status}`}>
-                              {item.status}
-                            </span>
-                          </td>
-                          <td>
-                            {new Date(item.created_at).toLocaleDateString()}
-                          </td>
-                          <td>
-                            <div className="action-buttons">
-                              <button
-                                onClick={() =>
-                                  handleItemAction(item.id, "edit")
-                                }
-                                className="edit-btn"
-                              >
-                                Edit
-                              </button>
-                              <button
-                                onClick={() =>
-                                  handleItemAction(item.id, "delete")
-                                }
-                                className="delete-btn"
-                              >
-                                Delete
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                )}
-              </div>
-            </div>
-          )}
 
           {activeTab === "user-items" && (
             <div className="user-items-section">
@@ -530,6 +363,98 @@ const AdminDashboard = () => {
             </div>
           )}
 
+          {activeTab === "all-posts" && (
+            <div className="all-posts-section">
+              <div className="section-header">
+                <div className="section-title">
+                  <h2>All Posts Management</h2>
+                  <p>View and manage all posts in the marketplace</p>
+                </div>
+              </div>
+              <div className="items-table">
+                {filteredAllPosts.length === 0 ? (
+                  <p>No posts found.</p>
+                ) : (
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Title</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Seller</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredAllPosts.map((item) => (
+                        <tr key={item.id}>
+                          <td>{item.title}</td>
+                          <td>{item.category}</td>
+                          <td>${item.price}</td>
+                          <td>
+                            {item.user?.name ||
+                              item.user?.username ||
+                              "Unknown"}
+                          </td>
+                          <td>
+                            <span className={`status-badge ${item.status}`}>
+                              {item.status}
+                            </span>
+                          </td>
+                          <td>
+                            {new Date(item.created_at).toLocaleDateString()}
+                          </td>
+                          <td>
+                            <div className="action-buttons">
+                              <button
+                                onClick={() =>
+                                  handleItemAction(item.id, "edit")
+                                }
+                                className="edit-btn"
+                              >
+                                Edit
+                              </button>
+                              <button
+                                onClick={() =>
+                                  handleItemAction(item.id, "delete")
+                                }
+                                className="delete-btn"
+                              >
+                                Delete
+                              </button>
+                              {item.status === "pending" && (
+                                <>
+                                  <button
+                                    onClick={() =>
+                                      handleItemAction(item.id, "approve")
+                                    }
+                                    className="approve-btn"
+                                  >
+                                    Approve
+                                  </button>
+                                  <button
+                                    onClick={() =>
+                                      handleItemAction(item.id, "reject")
+                                    }
+                                    className="reject-btn"
+                                  >
+                                    Reject
+                                  </button>
+                                </>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </div>
+            </div>
+          )}
+
           {activeTab === "users" && (
             <div className="users-section">
               <div className="section-header">
@@ -537,27 +462,7 @@ const AdminDashboard = () => {
                   <h2>User Management</h2>
                   <p>View and manage all registered users</p>
                 </div>
-                <div className="user-controls">
-                  <div className="active-users-toggle">
-                    <label className="toggle-label">
-                      <input
-                        type="checkbox"
-                        checked={showActiveOnly}
-                        onChange={(e) => setShowActiveOnly(e.target.checked)}
-                        className="toggle-input"
-                      />
-                      <span className="toggle-text">Show Active Only</span>
-                    </label>
-                    <div className="active-users-count">
-                      <span className="online-indicator"></span>
-                      {activeUsers.length} Active Users
-                    </div>
-                  </div>
-                  <button onClick={refreshUserStatus} className="refresh-btn">
-                    <span className="material-symbols-outlined">refresh</span>
-                    Refresh
-                  </button>
-                </div>
+                <div className="user-controls"></div>
               </div>
               <div className="users-table">
                 {filteredUsers.length === 0 ? (
@@ -566,7 +471,6 @@ const AdminDashboard = () => {
                   <table>
                     <thead>
                       <tr>
-                        <th>Status</th>
                         <th>Name</th>
                         <th>Email</th>
                         <th>Role</th>
@@ -578,15 +482,7 @@ const AdminDashboard = () => {
                     <tbody>
                       {filteredUsers.map((user) => (
                         <tr key={user.id}>
-                          <td>
-                            <div className="user-status">
-                              <span
-                                className={`status-indicator ${user.status}`}
-                              ></span>
-                              <span className="status-text">{user.status}</span>
-                            </div>
-                          </td>
-                          <td>{user.name}</td>
+                          <td>{user.username || user.name}</td>
                           <td>{user.email}</td>
                           <td>
                             <span className={`role-badge ${user.role}`}>
