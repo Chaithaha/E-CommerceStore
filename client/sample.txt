@@ -1,5 +1,23 @@
-App.js:78 
- POST http://localhost:5000/api/items 500 (Internal Server Error)
-__webpack_modules__../src/App.js.window.fetch	@	App.js:78
-post	@	apiClient.js:86
-handleSubmit	@	CreatePost.js:132
+Front End - 
+
+Welcome, (user) dropdown should have orange background with white text
+
+Add navbar for create-post
+
+Add field for create-post = market value
+
+Product cards need to reflect fields in posts with actual numbers 
+
+Battery health should only appear to phone/tablet category 
+
+optional - multiple image upload
+
+Authenticated as bar, shouldn't be a bar. make it a pop-up that appears for a second and goes away. Unauthenticated user shouldn't have to see the not 
+
+authenticated bar. it should only show up as an error if an unauthenticated user got access to anything that needs authentication. (complex maybe?)
+
+Backend maybe? - 
+
+Battery health should only appear to phone/tablet category 
+
+change categories to electronic based = Phone/Tablet, Home Appliances, Hardware, Computer Parts - (Supabase table might need to be updated?)

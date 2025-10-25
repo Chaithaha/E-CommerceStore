@@ -154,7 +154,7 @@ const HomePage = () => {
     <div className="landing-page">
       <div className="layout-container">
         {/* Debug Component */}
-        <AuthDebug />
+        {user && (user.email === "admin@example.com" || user.role === "admin") && <AuthDebug />}
 
         {/* Header Component */}
         <Header

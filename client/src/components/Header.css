@@ -1,8 +1,8 @@
 /* Design Tokens - Inline */
 :root {
   /* Primary Colors */
-  --primary: #1173d4;
-  --primary-dark: #0d5bb8;
+  --primary: #ff9500;
+  --primary-dark: #e68500;
   --primary-light: #42a5f5;
   --secondary: #dc004e;
   --secondary-light: #ff5983;
@@ -76,8 +76,8 @@
 }
 
 .dark {
-  --mui-primary: #90caf9;
-  --mui-primary-dark: #42a5f5;
+  --mui-primary: #ff9500;
+  --mui-primary-dark: #e68500;
   --mui-primary-light: #bbdefb;
   --mui-secondary: #ff4081;
   --mui-secondary-light: #ff80ab;
@@ -379,16 +379,6 @@
   box-shadow: var(--mui-shadow-1);
   text-transform: uppercase;
   position: relative;
-}
-
-.btn-primary {
-  background-color: var(--mui-primary);
-  color: var(--mui-text-primary);
-}
-
-.btn-primary:hover {
-  background-color: var(--mui-primary-dark);
-  box-shadow: var(--mui-shadow-2);
 }
 
 .btn-secondary {

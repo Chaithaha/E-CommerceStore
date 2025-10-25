@@ -140,7 +140,7 @@
 
 .product-title {
   color: #111827;
-  font-size: 0.875rem;
+  font-size: 1.125rem;
   font-weight: 500;
   line-height: 1.2;
   margin: 0;
@@ -148,7 +148,7 @@
 
 .dark .product-title {
   color: #ffffff;
-  font-size: 0.75rem;
+  font-size: 1rem;
 }
 
 .product-title-arrow {
@@ -309,15 +309,17 @@
   font-size: 0.875rem;
   font-weight: 600;
   border-radius: 6px;
-  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  background-color: #ff9500;
+  color: #ffffff;
   border: none;
   transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(255, 149, 0, 0.2);
 }
 
 .view-details-btn:hover {
-  background: linear-gradient(135deg, #0d5bb8, #0a4a94);
+  background-color: #e68500;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(17, 115, 212, 0.3);
+  box-shadow: 0 4px 12px rgba(255, 149, 0, 0.3);
 }
 
 /* Responsive Design */

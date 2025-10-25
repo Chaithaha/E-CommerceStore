@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 import {
   getProductImageUrl,
   getBatteryHealthColor,
@@ -12,6 +13,7 @@ import "../styles/common.css";
 
 const ProductCard = ({ product, onViewDetails }) => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [imageLoaded, setImageLoaded] = React.useState(false);
   const [imageError, setImageError] = React.useState(false);
   const [imageUrl, setImageUrl] = React.useState(null);
@@ -149,11 +151,11 @@ const ProductCard = ({ product, onViewDetails }) => {
       </div>
 
       <div className="product-content">
-        <div className="product-header">
+<div className="product-header">
+          <h3 className="product-title">{product.title}</h3>
           <div className="product-category">
             {product.category || "Electronics"}
           </div>
-          <h3 className="product-title">{product.title}</h3>
         </div>
 
         <div className="product-price-section">
@@ -202,7 +204,7 @@ const ProductCard = ({ product, onViewDetails }) => {
         </Button>
 
         {/* Debug button - only visible in development */}
-        {process.env.NODE_ENV === "development" && (
+        {process.env.NODE_ENV === "development" && user && (user.email === "admin@example.com" || user.role === "admin") && (
           <button
             className="debug-button"
             onClick={() => {

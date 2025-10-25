@@ -1,8 +1,8 @@
 /* Design Tokens - Inline */
 :root {
   /* Primary Colors */
-  --primary: #1173d4;
-  --primary-dark: #0d5bb8;
+  --primary: #ff9500;
+  --primary-dark: #e68500;
   --primary-light: #42a5f5;
 
   /* Status Colors */
@@ -320,7 +320,7 @@ main {
 }
 
 .search-btn:hover {
-  background-color: rgba(17, 115, 212, 0.9);
+  background-color: var(--primary-dark);
 }
 
 .search-label {
@@ -434,7 +434,7 @@ main {
 }
 
 .search-btn:hover {
-  background-color: rgba(17, 115, 212, 0.9);
+  background-color: var(--primary-dark);
 }
 
 /* Advanced Filter Button */
