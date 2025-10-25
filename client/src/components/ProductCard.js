@@ -16,7 +16,12 @@ const ProductCard = ({ product, onViewDetails }) => {
   const [imageError, setImageError] = React.useState(false);
   const [imageUrl, setImageUrl] = React.useState(null);
   const [imageDebugInfo, setImageDebugInfo] = React.useState(null);
-  const { fallbackUrl, isUsingFallback, handleImageError: handleFallbackError, resetFallback } = useImageFallback(product);
+  const {
+    fallbackUrl,
+    isUsingFallback,
+    handleImageError: handleFallbackError,
+    resetFallback,
+  } = useImageFallback(product);
 
   React.useEffect(() => {
     const loadImageUrl = async () => {
@@ -25,23 +30,23 @@ const ProductCard = ({ product, onViewDetails }) => {
         productTitle: product.title,
         hasImageUrl: !!product.image_url,
         hasImages: !!product.images,
-        imagesCount: product.images?.length || 0
+        imagesCount: product.images?.length || 0,
       });
 
       try {
         const url = await getProductImageUrl(product);
-        
+
         console.log("📡 Image URL result:", {
           productId: product.id,
           url: url,
           urlType: typeof url,
           isNull: url === null,
           isUndefined: url === undefined,
-          isEmpty: url === ""
+          isEmpty: url === "",
         });
 
         setImageUrl(url);
-        
+
         // Set debug info for troubleshooting
         setImageDebugInfo({
           productId: product.id,
@@ -50,23 +55,23 @@ const ProductCard = ({ product, onViewDetails }) => {
             image_url: product.image_url,
             images: product.images,
             hasDirectUrl: !!product.image_url,
-            hasImagesArray: !!(product.images && product.images.length > 0)
+            hasImagesArray: !!(product.images && product.images.length > 0),
           },
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         });
       } catch (error) {
         console.error("❌ Error loading image URL:", {
           productId: product.id,
           error: error.message,
           stack: error.stack,
-          product: product
+          product: product,
         });
-        
+
         setImageDebugInfo({
           productId: product.id,
           error: error.message,
           productData: product,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         });
       }
     };
@@ -90,14 +95,14 @@ const ProductCard = ({ product, onViewDetails }) => {
           src: event.target?.src,
           naturalWidth: event.target?.naturalWidth,
           naturalHeight: event.target?.naturalHeight,
-          complete: event.target?.complete
-        }
-      }
+          complete: event.target?.complete,
+        },
+      },
     });
 
     setImageError(true);
     setImageLoaded(false);
-    
+
     // Use the fallback system
     await handleFallbackError();
   };
@@ -118,7 +123,7 @@ const ProductCard = ({ product, onViewDetails }) => {
             <div className="loading-spinner"></div>
           </div>
         )}
-        {(imageUrl || fallbackUrl) ? (
+        {imageUrl || fallbackUrl ? (
           <img
             src={fallbackUrl || imageUrl}
             alt={product.title}
@@ -195,9 +200,9 @@ const ProductCard = ({ product, onViewDetails }) => {
         >
           View Details
         </Button>
-        
+
         {/* Debug button - only visible in development */}
-        {process.env.NODE_ENV === 'development' && (
+        {process.env.NODE_ENV === "development" && (
           <button
             className="debug-button"
             onClick={() => {
@@ -206,26 +211,28 @@ const ProductCard = ({ product, onViewDetails }) => {
                 imageUrl,
                 imageDebugInfo,
                 imageLoaded,
-                imageError
+                imageError,
               });
-              
+
               // Test image loading manually
               if (imageUrl) {
                 const testImg = new Image();
-                testImg.onload = () => console.log("✅ Manual image test successful");
-                testImg.onerror = (e) => console.error("❌ Manual image test failed:", e);
+                testImg.onload = () =>
+                  console.log("✅ Manual image test successful");
+                testImg.onerror = (e) =>
+                  console.error("❌ Manual image test failed:", e);
                 testImg.src = imageUrl;
               }
             }}
             style={{
-              marginTop: '8px',
-              padding: '4px 8px',
-              fontSize: '12px',
-              backgroundColor: '#ff6b6b',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer'
+              marginTop: "8px",
+              padding: "4px 8px",
+              fontSize: "12px",
+              backgroundColor: "#ff6b6b",
+              color: "white",
+              border: "none",
+              borderRadius: "4px",
+              cursor: "pointer",
             }}
           >
             Debug Image

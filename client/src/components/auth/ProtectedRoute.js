@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { Navigate } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
-import LoadingSpinner from '../common/LoadingSpinner';
+import React, { useEffect, useState } from "react";
+import { Navigate } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
+import LoadingSpinner from "../common/LoadingSpinner";
 
 const ProtectedRoute = ({ children, requireAdmin = false }) => {
   const { user, loading, isAdmin } = useAuth();
@@ -9,12 +9,13 @@ const ProtectedRoute = ({ children, requireAdmin = false }) => {
 
   useEffect(() => {
     // Check if we have an auth session missing error
-    const hasAuthError = localStorage.getItem('auth_error') === 'AUTH_SESSION_MISSING';
+    const hasAuthError =
+      localStorage.getItem("auth_error") === "AUTH_SESSION_MISSING";
     if (hasAuthError) {
       // Clear the error and continue with normal flow
-      localStorage.removeItem('auth_error');
+      localStorage.removeItem("auth_error");
     }
-    
+
     // Simulate checking authentication state
     const timer = setTimeout(() => {
       setIsChecking(false);
@@ -29,7 +30,7 @@ const ProtectedRoute = ({ children, requireAdmin = false }) => {
 
   if (!user) {
     // Store the current location for redirect after login
-    localStorage.setItem('redirect_after_login', window.location.pathname);
+    localStorage.setItem("redirect_after_login", window.location.pathname);
     // Redirect to login if not authenticated
     return <Navigate to="/login" replace />;
   }

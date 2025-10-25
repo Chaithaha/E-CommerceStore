@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 /**
  * Fallback image handling utility with multiple strategies
@@ -8,23 +8,29 @@ import React from 'react';
 const FALLBACK_STRATEGIES = {
   // Placeholder images from various sources
   placeholderImages: [
-    'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxOCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlIE5vdCBBdmFpbGFibGU8L3RleHQ+PC9zdmc+',
-    'https://via.placeholder.com/300x200/cccccc/999999?text=Image+Not+Available',
-    'https://picsum.photos/seed/fallback/300/200.jpg',
+    "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxOCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlIE5vdCBBdmFpbGFibGU8L3RleHQ+PC9zdmc+",
+    "https://via.placeholder.com/300x200/cccccc/999999?text=Image+Not+Available",
+    "https://picsum.photos/seed/fallback/300/200.jpg",
   ],
-  
+
   // Category-specific fallback images
   categoryImages: {
-    'Electronics': 'https://via.placeholder.com/300x200/4a90e2/ffffff?text=Electronics',
-    'Clothing': 'https://via.placeholder.com/300x200/e24a90/ffffff?text=Clothing',
-    'Home & Garden': 'https://via.placeholder.com/300x200/90e24a/ffffff?text=Home+Garden',
-    'Sports & Outdoors': 'https://via.placeholder.com/300x200/e2a04a/ffffff?text=Sports',
-    'Books': 'https://via.placeholder.com/300x200/a04ae2/ffffff?text=Books',
-    'Toys & Games': 'https://via.placeholder.com/300x200/e24a4a/ffffff?text=Toys',
-    'Automotive': 'https://via.placeholder.com/300x200/4ae2a0/ffffff?text=Automotive',
-    'Health & Beauty': 'https://via.placeholder.com/300x200/e24aa0/ffffff?text=Beauty',
-    'Other': 'https://via.placeholder.com/300x200/cccccc/999999?text=Other'
-  }
+    Electronics:
+      "https://via.placeholder.com/300x200/4a90e2/ffffff?text=Electronics",
+    Clothing: "https://via.placeholder.com/300x200/e24a90/ffffff?text=Clothing",
+    "Home & Garden":
+      "https://via.placeholder.com/300x200/90e24a/ffffff?text=Home+Garden",
+    "Sports & Outdoors":
+      "https://via.placeholder.com/300x200/e2a04a/ffffff?text=Sports",
+    Books: "https://via.placeholder.com/300x200/a04ae2/ffffff?text=Books",
+    "Toys & Games":
+      "https://via.placeholder.com/300x200/e24a4a/ffffff?text=Toys",
+    Automotive:
+      "https://via.placeholder.com/300x200/4ae2a0/ffffff?text=Automotive",
+    "Health & Beauty":
+      "https://via.placeholder.com/300x200/e24aa0/ffffff?text=Beauty",
+    Other: "https://via.placeholder.com/300x200/cccccc/999999?text=Other",
+  },
 };
 
 /**
@@ -37,22 +43,26 @@ export const getFallbackImageUrl = (product, attempt = 0) => {
   console.log("🔄 Getting fallback image:", {
     productId: product?.id,
     category: product?.category,
-    attempt
+    attempt,
   });
 
   // Strategy 1: Category-specific fallback
-  if (product?.category && FALLBACK_STRATEGIES.categoryImages[product.category]) {
+  if (
+    product?.category &&
+    FALLBACK_STRATEGIES.categoryImages[product.category]
+  ) {
     console.log("📂 Using category-specific fallback for:", product.category);
     return FALLBACK_STRATEGIES.categoryImages[product.category];
   }
 
   // Strategy 2: Cycle through placeholder images
-  const placeholderIndex = attempt % FALLBACK_STRATEGIES.placeholderImages.length;
+  const placeholderIndex =
+    attempt % FALLBACK_STRATEGIES.placeholderImages.length;
   const fallbackUrl = FALLBACK_STRATEGIES.placeholderImages[placeholderIndex];
-  
+
   console.log("🖼️ Using placeholder fallback:", {
     index: placeholderIndex,
-    url: fallbackUrl
+    url: fallbackUrl,
   });
 
   return fallbackUrl;
@@ -67,9 +77,9 @@ export const testImageUrl = async (url) => {
   if (!url) return false;
 
   try {
-    const response = await fetch(url, { 
-      method: 'HEAD',
-      mode: 'no-cors'
+    const response = await fetch(url, {
+      method: "HEAD",
+      mode: "no-cors",
     });
     return true;
   } catch (error) {
@@ -86,20 +96,25 @@ export const testImageUrl = async (url) => {
  */
 export const getWorkingFallbackImage = async (product, maxAttempts = 3) => {
   console.log("🔍 Searching for working fallback image...");
-  
+
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
     const fallbackUrl = getFallbackImageUrl(product, attempt);
-    
-    console.log(`🧪 Testing fallback image (attempt ${attempt + 1}):`, fallbackUrl);
-    
+
+    console.log(
+      `🧪 Testing fallback image (attempt ${attempt + 1}):`,
+      fallbackUrl,
+    );
+
     // For data URLs and certain placeholder services, skip the test and return directly
-    if (fallbackUrl.startsWith('data:image/') || 
-        fallbackUrl.includes('via.placeholder.com') ||
-        fallbackUrl.includes('picsum.photos')) {
+    if (
+      fallbackUrl.startsWith("data:image/") ||
+      fallbackUrl.includes("via.placeholder.com") ||
+      fallbackUrl.includes("picsum.photos")
+    ) {
       console.log("✅ Using trusted fallback image:", fallbackUrl);
       return fallbackUrl;
     }
-    
+
     // Test other URLs
     const isAccessible = await testImageUrl(fallbackUrl);
     if (isAccessible) {
@@ -107,7 +122,7 @@ export const getWorkingFallbackImage = async (product, maxAttempts = 3) => {
       return fallbackUrl;
     }
   }
-  
+
   // If all attempts fail, return the first placeholder
   console.warn("⚠️ All fallback attempts failed, using default placeholder");
   return FALLBACK_STRATEGIES.placeholderImages[0];
@@ -125,12 +140,15 @@ export const useImageFallback = (product) => {
 
   const handleImageError = React.useCallback(async () => {
     console.log("🔄 Image load failed, attempting fallback...");
-    
+
     try {
-      const workingFallback = await getWorkingFallbackImage(product, fallbackAttempt + 1);
+      const workingFallback = await getWorkingFallbackImage(
+        product,
+        fallbackAttempt + 1,
+      );
       setFallbackUrl(workingFallback);
       setIsUsingFallback(true);
-      setFallbackAttempt(prev => prev + 1);
+      setFallbackAttempt((prev) => prev + 1);
     } catch (error) {
       console.error("❌ Failed to get fallback image:", error);
     }
@@ -147,7 +165,7 @@ export const useImageFallback = (product) => {
     isUsingFallback,
     fallbackAttempt,
     handleImageError,
-    resetFallback
+    resetFallback,
   };
 };
 
@@ -155,5 +173,5 @@ export default {
   getFallbackImageUrl,
   testImageUrl,
   getWorkingFallbackImage,
-  useImageFallback
+  useImageFallback,
 };

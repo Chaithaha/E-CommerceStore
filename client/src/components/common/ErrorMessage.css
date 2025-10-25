@@ -59,9 +59,16 @@
 }
 
 @keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-5px); }
-  75% { transform: translateX(5px); }
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+  }
 }
 
 /* Responsive design */
@@ -70,20 +77,20 @@
     padding: 20px;
     margin: 10px;
   }
-  
+
   .error-icon {
     font-size: 36px;
   }
-  
+
   .error-message h3 {
     font-size: 20px;
   }
-  
+
   .error-message p {
     font-size: 14px;
     max-width: 300px;
   }
-  
+
   .retry-button {
     padding: 10px 20px;
     font-size: 14px;

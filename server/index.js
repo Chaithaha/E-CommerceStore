@@ -89,6 +89,8 @@ const itemsRouter = require('./routes/items');
 const imagesRouter = require('./routes/images');
 const testImagesRouter = require('./routes/test-images');
 const authRouter = require('./routes/auth-simple');
+const diagnosticsRouter = require('./routes/diagnostics');
+const marketValueRouter = require('./routes/marketValue');
 const { authenticateToken } = require('./middleware/auth');
 
 // Public routes (no authentication required)
@@ -102,6 +104,8 @@ app.use('/api/images', authenticateToken, imagesRouter.router);
 // Routes that handle their own authentication per endpoint
 app.use('/api/posts', postsRouter);
 app.use('/api/items', itemsRouter);
+app.use('/api/diagnostics', diagnosticsRouter);
+app.use('/api/market-value', marketValueRouter);
 
 // Test route for image upload without authentication
 app.use('/api/images/test', testImagesRouter);
@@ -139,7 +143,18 @@ app.get('/api', (req, res) => {
         'DELETE /api/items/:id': 'Delete item (auth required)',
         'GET /api/images/:postId': 'Get images for post (auth required)',
         'POST /api/images/store-metadata': 'Store image metadata (auth required)',
-        'DELETE /api/images/:id': 'Delete image (auth required)'
+        'DELETE /api/images/:id': 'Delete image (auth required)',
+        'POST /api/diagnostics': 'Create diagnostic report (auth required)',
+        'PUT /api/diagnostics/:id': 'Update diagnostic report (auth required)',
+        'DELETE /api/diagnostics/:id': 'Delete diagnostic report (auth required)',
+        'POST /api/market-value/data': 'Add market data (auth required)'
+      },
+      mixed: {
+        'GET /api/diagnostics/product/:product_id': 'Get diagnostic reports for product (public)',
+        'GET /api/diagnostics/:id': 'Get specific diagnostic report (public)',
+        'GET /api/market-value/calculate/:product_id': 'Calculate market value for product (public)',
+        'GET /api/market-value/data': 'Get market data (public, filterable)',
+        'GET /api/market-value/analysis/:product_id': 'Get market analysis for product (public)'
       },
       test: {
         'GET /test': 'Basic connectivity test',

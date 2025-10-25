@@ -16,7 +16,7 @@ const Header = ({
   onLogout,
 }) => {
   const navigate = useNavigate();
-  const { isAdmin } = useAuth();
+  const { isAdmin, logout } = useAuth();
 
   const handleSignIn = () => {
     navigate("/login");
@@ -35,15 +35,18 @@ const Header = ({
   };
 
   const handleLogout = async () => {
-    if (onLogout) {
-      try {
+    try {
+      // Use AuthContext logout function if available, otherwise fall back to prop
+      if (logout) {
+        await logout();
+      } else if (onLogout) {
         await onLogout();
-      } catch (error) {
-        console.error("Logout failed:", error);
-        // Still navigate even if logout fails
       }
+    } catch (error) {
+      console.error("Logout failed:", error);
+      // Still navigate even if logout fails
     }
-    navigate("/");
+    navigate("/home");
   };
 
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
@@ -119,7 +122,9 @@ const Header = ({
                     {isAdmin() && (
                       <button
                         className="dropdown-item admin-item"
-                        onClick={() => handleDropdownItemClick(handleNavigateToAdmin)}
+                        onClick={() =>
+                          handleDropdownItemClick(handleNavigateToAdmin)
+                        }
                       >
                         <span className="material-symbols-outlined">
                           dashboard

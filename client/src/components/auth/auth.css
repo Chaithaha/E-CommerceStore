@@ -20,7 +20,7 @@
 }
 
 .auth-form::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -183,7 +183,9 @@
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .auth-footer {
@@ -244,7 +246,7 @@
 }
 
 .error-message::before {
-  content: '⚠️';
+  content: "⚠️";
   font-size: 16px;
 }
 
@@ -254,11 +256,11 @@
     padding: 30px 20px;
     margin: 10px;
   }
-  
+
   .auth-header h2 {
     font-size: 24px;
   }
-  
+
   .form-options {
     flex-direction: column;
     gap: 12px;
@@ -343,7 +345,9 @@
   background: rgba(255, 255, 255, 0.1);
   border-radius: 12px;
   backdrop-filter: blur(10px);
-  transition: transform 0.3s ease, background 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    background 0.3s ease;
 }
 
 .feature-item:hover {
@@ -439,32 +443,32 @@
   .auth-container {
     flex-direction: column;
   }
-  
+
   .auth-background {
     flex: none;
     height: 50vh;
     padding: 20px;
   }
-  
+
   .auth-form-wrapper {
     flex: none;
     height: 50vh;
     padding: 20px;
   }
-  
+
   .auth-welcome h1 {
     font-size: 2rem;
   }
-  
+
   .auth-features {
     grid-template-columns: 1fr;
     gap: 1rem;
   }
-  
+
   .feature-item {
     padding: 1rem;
   }
-  
+
   .auth-form {
     padding: 30px 20px;
     margin: 10px;
@@ -475,29 +479,29 @@
   .auth-background {
     padding: 15px;
   }
-  
+
   .auth-form-wrapper {
     padding: 15px;
   }
-  
+
   .auth-welcome h1 {
     font-size: 1.5rem;
   }
-  
+
   .auth-welcome p {
     font-size: 1rem;
   }
-  
+
   .feature-icon {
     font-size: 1.5rem;
     width: 50px;
     height: 50px;
   }
-  
+
   .feature-text h3 {
     font-size: 1rem;
   }
-  
+
   .feature-text p {
     font-size: 0.8rem;
   }

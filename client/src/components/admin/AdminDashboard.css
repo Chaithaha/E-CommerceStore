@@ -29,7 +29,11 @@
 }
 
 .dashboard-header-content {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--primary) 0%,
+    var(--primary-dark) 100%
+  );
   color: var(--text-white);
   padding: 2.5rem;
   border-radius: var(--radius-xl);
@@ -71,7 +75,9 @@
   display: flex;
   align-items: center;
   gap: 1rem;
-  transition: transform var(--transition-normal), background-color var(--transition-normal);
+  transition:
+    transform var(--transition-normal),
+    background-color var(--transition-normal);
 }
 
 .stat-card:hover {
@@ -173,7 +179,7 @@
 }
 
 .tab-button.active::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: 0;
   left: 0;
@@ -271,8 +277,6 @@
   margin: 0;
   font-size: var(--font-size-sm);
 }
-
-
 
 /* Overview Section */
 .overview-section {

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Authentication Test</title>
+</head>
+<body>
+    <h1>Authentication Flow Test</h1>
+    <div id="results"></div>
+    
+    <script>
+        const API_URL = 'http://localhost:5000';
+        const results = document.getElementById('results');
+        
+        function log(message) {
+            console.log(message);
+            results.innerHTML += '<p>' + message + '</p>';
+        }
+        
+        async function testAuth() {
+            try {
+                log('Testing authentication flow...');
+                
+                // Test signup
+                log('1. Testing signup...');
+                const signupResponse = await fetch(API_URL + '/api/auth/signup', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: 'testuser@example.com',
+                        password: 'test123456',
+                        metadata: {
+                            full_name: 'Test User'
+                        }
+                    })
+                });
+                
+                const signupData = await signupResponse.json();
+                log('Signup response: ' + JSON.stringify(signupData, null, 2));
+                
+                // Test login
+                log('2. Testing login...');
+                const loginResponse = await fetch(API_URL + '/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: 'testuser@example.com',
+                        password: 'test123456'
+                    })
+                });
+                
+                const loginData = await loginResponse.json();
+                log('Login response: ' + JSON.stringify(loginData, null, 2));
+                
+                if (loginData.success) {
+                    // Store tokens as the client would
+                    localStorage.setItem('access_token', loginData.data.token);
+                    localStorage.setItem('user_data', JSON.stringify(loginData.data.user));
+                    log('3. Tokens stored in localStorage');
+                    
+                    // Test authenticated request
+                    log('4. Testing authenticated request...');
+                    const authResponse = await fetch(API_URL + '/api/auth/me', {
+                        headers: {
+                            'Authorization': 'Bearer ' + loginData.data.token,
+                            'Content-Type': 'application/json',
+                        }
+                    });
+                    
+                    const authData = await authResponse.json();
+                    log('Authenticated request response: ' + JSON.stringify(authData, null, 2));
+                }
+                
+                log('✅ Authentication test completed!');
+                
+            } catch (error) {
+                log('❌ Error: ' + error.message);
+            }
+        }
+        
+        // Run test
+        testAuth();
+    </script>
+</body>
+</html>

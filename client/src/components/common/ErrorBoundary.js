@@ -1,5 +1,5 @@
-import React from 'react';
-import './ErrorBoundary.css';
+import React from "react";
+import "./ErrorBoundary.css";
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -14,10 +14,10 @@ class ErrorBoundary extends React.Component {
 
   componentDidCatch(error, errorInfo) {
     // Log error details
-    console.error('ErrorBoundary caught an error:', error, errorInfo);
+    console.error("ErrorBoundary caught an error:", error, errorInfo);
     this.setState({
       error: error,
-      errorInfo: errorInfo
+      errorInfo: errorInfo,
     });
   }
 
@@ -32,9 +32,12 @@ class ErrorBoundary extends React.Component {
           <div className="error-boundary-content">
             <div className="error-boundary-icon">⚠️</div>
             <h2>Something went wrong</h2>
-            <p>We're sorry, but something unexpected happened. Please try refreshing the page.</p>
-            
-            {process.env.NODE_ENV === 'development' && this.state.error && (
+            <p>
+              We're sorry, but something unexpected happened. Please try
+              refreshing the page.
+            </p>
+
+            {process.env.NODE_ENV === "development" && this.state.error && (
               <details className="error-boundary-details">
                 <summary>Error Details (Development)</summary>
                 <pre className="error-boundary-stack">
@@ -43,15 +46,15 @@ class ErrorBoundary extends React.Component {
                 </pre>
               </details>
             )}
-            
+
             <div className="error-boundary-actions">
-              <button 
+              <button
                 className="error-boundary-button primary"
                 onClick={this.handleRetry}
               >
                 Try Again
               </button>
-              <button 
+              <button
                 className="error-boundary-button secondary"
                 onClick={() => window.location.reload()}
               >
@@ -68,4 +71,3 @@ class ErrorBoundary extends React.Component {
 }
 
 export default ErrorBoundary;
-

@@ -1,5 +1,3 @@
-
-
 /**
  * Get the best image URL for a product/post
  * Handles legacy image_url and new images array format with storage paths
@@ -12,7 +10,7 @@ export const getProductImageUrl = async (product) => {
       productId: product.id,
       hasImageUrl: !!product.image_url,
       hasImages: !!(product.images && product.images.length > 0),
-      imagesCount: product.images?.length || 0
+      imagesCount: product.images?.length || 0,
     });
 
     // If product has a direct image_url (main image)
@@ -28,7 +26,7 @@ export const getProductImageUrl = async (product) => {
         imageId: firstImage.id,
         hasPublicUrl: !!firstImage.publicUrl,
         hasImageUrl: !!firstImage.image_url,
-        hasStoragePath: !!firstImage.storage_path
+        hasStoragePath: !!firstImage.storage_path,
       });
 
       // Priority order: publicUrl > image_url > storage_path

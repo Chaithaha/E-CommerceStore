@@ -71,7 +71,7 @@ const AdminNavbar = ({ isDarkMode, setIsDarkMode }) => {
     <header className="admin-navbar">
       <div className="admin-navbar-main">
         <div className="admin-logo-section">
-          <button 
+          <button
             onClick={handleNavigateToLanding}
             className="admin-logo-button"
           >
@@ -106,8 +106,8 @@ const AdminNavbar = ({ isDarkMode, setIsDarkMode }) => {
         </div>
 
         <div className="admin-action-buttons">
-          <Button 
-            variant="primary" 
+          <Button
+            variant="primary"
             onClick={handleNavigateToCreatePost}
             className="admin-create-btn"
           >
@@ -120,7 +120,9 @@ const AdminNavbar = ({ isDarkMode, setIsDarkMode }) => {
               <span className="material-symbols-outlined admin-user-icon">
                 admin_panel_settings
               </span>
-              <span className="admin-welcome-text">Admin: {getDisplayName()}</span>
+              <span className="admin-welcome-text">
+                Admin: {getDisplayName()}
+              </span>
               <span className="material-symbols-outlined admin-dropdown-arrow">
                 {isDropdownOpen ? "expand_less" : "expand_more"}
               </span>
@@ -130,14 +132,18 @@ const AdminNavbar = ({ isDarkMode, setIsDarkMode }) => {
               <div className="admin-dropdown-menu">
                 <button
                   className="admin-dropdown-item"
-                  onClick={() => handleDropdownItemClick(handleNavigateToLanding)}
+                  onClick={() =>
+                    handleDropdownItemClick(handleNavigateToLanding)
+                  }
                 >
                   <span className="material-symbols-outlined">storefront</span>
                   <span>View Marketplace</span>
                 </button>
                 <button
                   className="admin-dropdown-item"
-                  onClick={() => handleDropdownItemClick(handleNavigateToCreatePost)}
+                  onClick={() =>
+                    handleDropdownItemClick(handleNavigateToCreatePost)
+                  }
                 >
                   <span className="material-symbols-outlined">add_circle</span>
                   <span>Create Post</span>
@@ -153,7 +159,10 @@ const AdminNavbar = ({ isDarkMode, setIsDarkMode }) => {
             )}
           </div>
 
-          <IconButton onClick={handleToggleDarkMode} className="admin-theme-toggle">
+          <IconButton
+            onClick={handleToggleDarkMode}
+            className="admin-theme-toggle"
+          >
             <span className="material-symbols-outlined">
               {isDarkMode ? "light_mode" : "dark_mode"}
             </span>

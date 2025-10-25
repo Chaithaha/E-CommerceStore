@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { auth, handleSupabaseError } from "../utils/supabase";
 
 const AuthContext = createContext();
 
@@ -22,25 +21,26 @@ export const AuthProvider = ({ children }) => {
       try {
         setLoading(true);
 
-        
+        // First check if we have a stored token from server authentication
+        const storedToken = localStorage.getItem("access_token");
+        const storedUserData = localStorage.getItem("user_data");
 
-        // First check if we have a stored session
-        const result = await auth.getUser();
-
-        if (result.success && result.data) {
-          setUser(result.data);
-          console.log("User authenticated:", result.data.email);
-        } else {
-          // Handle different error scenarios
-          if (
-            result.error?.code === "AUTH_SESSION_MISSING" ||
-            result.error?.message?.includes("Auth session missing")
-          ) {
-            console.log("No active session found - user needs to sign in");
-          } else if (result.error) {
-            console.warn("Auth initialization error:", result.error);
-            setError(result.error || "Authentication failed. Please sign in.");
+        if (storedToken && storedUserData) {
+          try {
+            const userData = JSON.parse(storedUserData);
+            setUser(userData);
+            console.log(
+              "User authenticated from server token:",
+              userData.email,
+            );
+          } catch (parseError) {
+            console.error("Failed to parse stored user data:", parseError);
+            // Clear invalid data
+            localStorage.removeItem("access_token");
+            localStorage.removeItem("user_data");
           }
+        } else {
+          console.log("No active session found - user needs to sign in");
         }
       } catch (err) {
         console.error("Auth initialization error:", err);
@@ -66,122 +66,22 @@ export const AuthProvider = ({ children }) => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Listen for auth state changes
-  useEffect(() => {
-    const {
-      data: { subscription },
-    } = auth.onAuthStateChange(async (event, session) => {
-      console.log("Auth state changed:", event, session?.user?.email);
-
-      if (event === "SIGNED_IN" && session?.user) {
-        setUser(session.user);
-        setError(null);
-      } else if (event === "SIGNED_OUT") {
-        setUser(null);
-        setError(null);
-      } else if (event === "TOKEN_REFRESHED" && session?.user) {
-        setUser(session.user);
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  // Attempt to recover session on app load
-  useEffect(() => {
-    const recoverSession = async () => {
-      try {
-        // Check if we have a stored session
-        const storedSession = localStorage.getItem("supabase.auth.token");
-        if (storedSession) {
-          console.log("Found stored session, attempting recovery");
-          const result = await auth.getUser();
-          if (result.success && result.data) {
-            setUser(result.data);
-            console.log("Session recovered successfully");
-          }
-        }
-      } catch (err) {
-        console.log("Session recovery failed:", err);
-        // This is expected if no valid session exists
-      }
-    };
-
-    // Only run recovery after initial auth check
-    const timer = setTimeout(recoverSession, 500);
-    return () => clearTimeout(timer);
-  }, []);
-
-  // Login function
-  const login = async (email, password) => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const result = await auth.signIn(email, password);
-
-      if (result.success) {
-        setUser(result.data?.user || null);
-        return { success: true, data: result.data };
-      } else {
-        setError(result.error);
-        return { success: false, error: result.error };
-      }
-    } catch (err) {
-      const errorResult = handleSupabaseError(err);
-      setError(errorResult.error);
-      return { success: false, error: errorResult.error };
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Signup function
-  const signup = async (email, password, metadata = {}) => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const result = await auth.signUp(email, password, metadata);
-
-      if (result.success) {
-        setUser(result.data?.user || null);
-        return { success: true, data: result.data };
-      } else {
-        setError(result.error);
-        return { success: false, error: result.error };
-      }
-    } catch (err) {
-      const errorResult = handleSupabaseError(err);
-      setError(errorResult.error);
-      return { success: false, error: errorResult.error };
-    } finally {
-      setLoading(false);
-    }
-  };
-
   // Logout function
   const logout = async () => {
     try {
       setLoading(true);
       setError(null);
 
-      const result = await auth.signOut();
+      // Clear server authentication data
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("user_data");
 
-      // Handle both mock and real Supabase responses
-      if (result.success !== false) {
-        setUser(null);
-        // Clear any stored session data
-        localStorage.removeItem("supabase.auth.token");
-        return { success: true };
-      } else {
-        setError(result.error);
-        return { success: false, error: result.error };
-      }
+      setUser(null);
+      return { success: true };
     } catch (err) {
-      const errorResult = handleSupabaseError(err);
-      setError(errorResult.error);
-      return { success: false, error: errorResult.error };
+      console.error("Logout error:", err);
+      setError("Logout failed");
+      return { success: false, error: "Logout failed" };
     } finally {
       setLoading(false);
     }
@@ -194,16 +94,47 @@ export const AuthProvider = ({ children }) => {
 
   // Get user display name
   const getDisplayName = () => {
-    return user?.user_metadata?.full_name || user?.email || "User";
+    return user?.full_name || user?.email || "User";
+  };
+
+  // Force refresh authentication state (useful after server login)
+  const refreshAuth = async () => {
+    try {
+      setLoading(true);
+
+      // Check for server authentication data
+      const storedToken = localStorage.getItem("access_token");
+      const storedUserData = localStorage.getItem("user_data");
+
+      if (storedToken && storedUserData) {
+        try {
+          const userData = JSON.parse(storedUserData);
+          setUser(userData);
+          console.log("Authentication state refreshed:", userData.email);
+        } catch (parseError) {
+          console.error("Failed to parse stored user data:", parseError);
+          // Clear invalid data
+          localStorage.removeItem("access_token");
+          localStorage.removeItem("user_data");
+          setUser(null);
+        }
+      } else {
+        setUser(null);
+      }
+    } catch (err) {
+      console.error("Error refreshing auth state:", err);
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const value = {
     user,
     loading,
     error,
-    login,
-    signup,
     logout,
+    refreshAuth,
     isAdmin,
     getDisplayName,
     isAuthenticated: !!user,
