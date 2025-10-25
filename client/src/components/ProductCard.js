@@ -5,6 +5,7 @@ import {
   getBatteryHealthColor,
   getBatteryHealthLabel,
 } from "../utils/productUtils";
+import { useImageFallback } from "../utils/imageFallback";
 import Button from "./common/Button";
 import "./ProductCard.css";
 import "../styles/common.css";
@@ -14,11 +15,60 @@ const ProductCard = ({ product, onViewDetails }) => {
   const [imageLoaded, setImageLoaded] = React.useState(false);
   const [imageError, setImageError] = React.useState(false);
   const [imageUrl, setImageUrl] = React.useState(null);
+  const [imageDebugInfo, setImageDebugInfo] = React.useState(null);
+  const { fallbackUrl, isUsingFallback, handleImageError: handleFallbackError, resetFallback } = useImageFallback(product);
 
   React.useEffect(() => {
     const loadImageUrl = async () => {
-      const url = await getProductImageUrl(product);
-      setImageUrl(url);
+      console.log("🖼️ Loading image URL for product:", {
+        productId: product.id,
+        productTitle: product.title,
+        hasImageUrl: !!product.image_url,
+        hasImages: !!product.images,
+        imagesCount: product.images?.length || 0
+      });
+
+      try {
+        const url = await getProductImageUrl(product);
+        
+        console.log("📡 Image URL result:", {
+          productId: product.id,
+          url: url,
+          urlType: typeof url,
+          isNull: url === null,
+          isUndefined: url === undefined,
+          isEmpty: url === ""
+        });
+
+        setImageUrl(url);
+        
+        // Set debug info for troubleshooting
+        setImageDebugInfo({
+          productId: product.id,
+          generatedUrl: url,
+          productData: {
+            image_url: product.image_url,
+            images: product.images,
+            hasDirectUrl: !!product.image_url,
+            hasImagesArray: !!(product.images && product.images.length > 0)
+          },
+          timestamp: new Date().toISOString()
+        });
+      } catch (error) {
+        console.error("❌ Error loading image URL:", {
+          productId: product.id,
+          error: error.message,
+          stack: error.stack,
+          product: product
+        });
+        
+        setImageDebugInfo({
+          productId: product.id,
+          error: error.message,
+          productData: product,
+          timestamp: new Date().toISOString()
+        });
+      }
     };
 
     loadImageUrl();
@@ -29,13 +79,27 @@ const ProductCard = ({ product, onViewDetails }) => {
     setImageError(false);
   };
 
-  const handleImageError = () => {
+  const handleImageError = async (event) => {
+    console.error("❌ Image failed to load:", {
+      productId: product.id,
+      imageUrl: imageUrl,
+      imageDebugInfo,
+      event: {
+        type: event.type,
+        target: {
+          src: event.target?.src,
+          naturalWidth: event.target?.naturalWidth,
+          naturalHeight: event.target?.naturalHeight,
+          complete: event.target?.complete
+        }
+      }
+    });
+
     setImageError(true);
     setImageLoaded(false);
-    // Try to get a fallback image URL
-    if (imageUrl) {
-      setImageUrl(null);
-    }
+    
+    // Use the fallback system
+    await handleFallbackError();
   };
 
   const handleViewDetails = () => {
@@ -54,11 +118,11 @@ const ProductCard = ({ product, onViewDetails }) => {
             <div className="loading-spinner"></div>
           </div>
         )}
-        {imageUrl ? (
+        {(imageUrl || fallbackUrl) ? (
           <img
-            src={imageUrl}
+            src={fallbackUrl || imageUrl}
             alt={product.title}
-            className={`product-image ${imageLoaded ? "loaded" : ""}`}
+            className={`product-image ${imageLoaded ? "loaded" : ""} ${isUsingFallback ? "fallback-image" : ""}`}
             onLoad={handleImageLoad}
             onError={handleImageError}
           />
@@ -67,7 +131,12 @@ const ProductCard = ({ product, onViewDetails }) => {
             <span>No image</span>
           </div>
         )}
-        {imageError && (
+        {isUsingFallback && (
+          <div className="fallback-indicator">
+            <span>Fallback Image</span>
+          </div>
+        )}
+        {imageError && !isUsingFallback && (
           <div className="product-image-error">
             <span>Image not available</span>
           </div>
@@ -126,6 +195,42 @@ const ProductCard = ({ product, onViewDetails }) => {
         >
           View Details
         </Button>
+        
+        {/* Debug button - only visible in development */}
+        {process.env.NODE_ENV === 'development' && (
+          <button
+            className="debug-button"
+            onClick={() => {
+              console.log("🔍 Product Card Debug Info:", {
+                product,
+                imageUrl,
+                imageDebugInfo,
+                imageLoaded,
+                imageError
+              });
+              
+              // Test image loading manually
+              if (imageUrl) {
+                const testImg = new Image();
+                testImg.onload = () => console.log("✅ Manual image test successful");
+                testImg.onerror = (e) => console.error("❌ Manual image test failed:", e);
+                testImg.src = imageUrl;
+              }
+            }}
+            style={{
+              marginTop: '8px',
+              padding: '4px 8px',
+              fontSize: '12px',
+              backgroundColor: '#ff6b6b',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer'
+            }}
+          >
+            Debug Image
+          </button>
+        )}
       </div>
     </div>
   );

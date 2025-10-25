@@ -1,4 +1,78 @@
-@import "./styles/designTokens.css";
+/* Design Tokens - Inline */
+:root {
+  /* Primary Colors */
+  --primary: #1173d4;
+  --primary-dark: #0d5bb8;
+  --primary-light: #42a5f5;
+
+  /* Status Colors */
+  --success: #28a745;
+  --danger: #dc3545;
+  --warning: #f59e0b;
+  --info: #007bff;
+
+  /* Background Colors */
+  --bg-white: #ffffff;
+  --bg-gray-50: #f9fafb;
+  --bg-gray-100: #f3f4f6;
+  --bg-gray-200: #e5e7eb;
+  --bg-gray-900: #111827;
+  --bg-dark-192633: #192633;
+  --bg-dark-233648: #233648;
+  --bg-dark-2f465c: #2f465c;
+
+  /* Text Colors */
+  --text-white: #ffffff;
+  --text-gray-100: #f3f4f6;
+  --text-gray-300: #d1d5db;
+  --text-gray-400: #9ca3af;
+  --text-gray-500: #6b7280;
+  --text-gray-600: #4b5563;
+  --text-gray-700: #374151;
+  --text-gray-800: #1f2937;
+  --text-gray-900: #111827;
+  --text-dark-92adc9: #92adc9;
+
+  /* Border Colors */
+  --border-gray-200: #e5e7eb;
+  --border-dark: #324d67;
+
+  /* Shadows */
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+
+  /* Border Radius */
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-full: 9999px;
+
+  /* Spacing */
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+
+  /* Typography */
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+  --font-size-4xl: 2.25rem;
+  --font-size-5xl: 3rem;
+  --font-size-6xl: 3.75rem;
+
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+  --font-weight-black: 900;
+
+  /* Transitions */
+  --transition-normal: 0.2s ease;
+}
 
 /* Landing Page Specific Variables */
 :root {

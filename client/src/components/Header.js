@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 import { toggleDarkMode } from "../utils/darkMode";
 import Button from "./common/Button";
 import IconButton from "./common/IconButton";
@@ -15,6 +16,7 @@ const Header = ({
   onLogout,
 }) => {
   const navigate = useNavigate();
+  const { isAdmin } = useAuth();
 
   const handleSignIn = () => {
     navigate("/login");
@@ -26,6 +28,10 @@ const Header = ({
 
   const handleCreatePost = () => {
     navigate("/create-post");
+  };
+
+  const handleNavigateToAdmin = () => {
+    navigate("/admin");
   };
 
   const handleLogout = async () => {
@@ -110,6 +116,17 @@ const Header = ({
 
                 {isDropdownOpen && (
                   <div className="dropdown-menu">
+                    {isAdmin() && (
+                      <button
+                        className="dropdown-item admin-item"
+                        onClick={() => handleDropdownItemClick(handleNavigateToAdmin)}
+                      >
+                        <span className="material-symbols-outlined">
+                          dashboard
+                        </span>
+                        <span>Dashboard</span>
+                      </button>
+                    )}
                     <button
                       className="dropdown-item"
                       onClick={() => handleDropdownItemClick(handleCreatePost)}

@@ -1,23 +1,77 @@
-/* Material UI-like CSS Variables */
+/* Design Tokens - Inline */
 :root {
-  --mui-primary: #1976d2;
-  --mui-primary-dark: #115293;
-  --mui-primary-light: #42a5f5;
-  --mui-secondary: #dc004e;
-  --mui-secondary-light: #ff5983;
-  --mui-background: #ffffff;
-  --mui-surface: #f5f5f5;
-  --mui-error: #d32f2f;
-  --mui-text-primary: rgba(0, 0, 0, 0.87);
-  --mui-text-secondary: rgba(0, 0, 0, 0.6);
-  --mui-text-disabled: rgba(0, 0, 0, 0.38);
-  --mui-divider: rgba(0, 0, 0, 0.12);
-  --mui-border-radius: 4px;
-  --mui-border-radius-large: 8px;
-  --mui-shadow-1: 0 2px 4px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
-  --mui-shadow-2: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
-  --mui-shadow-3: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
-  --mui-transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  /* Primary Colors */
+  --primary: #1173d4;
+  --primary-dark: #0d5bb8;
+  --primary-light: #42a5f5;
+  --secondary: #dc004e;
+  --secondary-light: #ff5983;
+
+  /* Status Colors */
+  --success: #28a745;
+  --danger: #dc3545;
+  --warning: #f59e0b;
+  --info: #007bff;
+
+  /* Background Colors */
+  --bg-white: #ffffff;
+  --bg-gray-50: #f9fafb;
+  --bg-gray-100: #f3f4f6;
+  --bg-gray-200: #e5e7eb;
+  --bg-gray-900: #111827;
+  --bg-dark-192633: #192633;
+  --bg-dark-233648: #233648;
+  --bg-dark-2f465c: #2f465c;
+
+  /* Text Colors */
+  --text-white: #ffffff;
+  --text-gray-100: #f3f4f6;
+  --text-gray-300: #d1d5db;
+  --text-gray-400: #9ca3af;
+  --text-gray-500: #6b7280;
+  --text-gray-600: #4b5563;
+  --text-gray-700: #374151;
+  --text-gray-800: #1f2937;
+  --text-gray-900: #111827;
+  --text-dark-92adc9: #92adc9;
+
+  /* Border Colors */
+  --border-gray-200: #e5e7eb;
+  --border-dark: #324d67;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+
+  /* Border Radius */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --radius-full: 9999px;
+}
+
+/* Header-specific mappings to design tokens */
+:root {
+  --mui-primary: var(--primary);
+  --mui-primary-dark: var(--primary-dark);
+  --mui-primary-light: var(--primary-light);
+  --mui-secondary: var(--secondary);
+  --mui-secondary-light: var(--secondary-light);
+  --mui-background: var(--bg-white);
+  --mui-surface: var(--bg-gray-50);
+  --mui-error: var(--danger);
+  --mui-text-primary: var(--text-gray-800);
+  --mui-text-secondary: var(--text-gray-600);
+  --mui-text-disabled: var(--text-gray-400);
+  --mui-divider: var(--border-gray-200);
+  --mui-border-radius: var(--radius-sm);
+  --mui-border-radius-large: var(--radius-md);
+  --mui-shadow-1: var(--shadow-sm);
+  --mui-shadow-2: var(--shadow-md);
+  --mui-shadow-3: var(--shadow-lg);
+  --mui-transition: var(--transition-normal);
 }
 
 .dark {
@@ -170,14 +224,32 @@
   gap: 0.5rem;
 }
 
-.user-welcome {
+.user-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-trigger {
   display: flex;
   align-items: center;
+  gap: 0.5rem;
   padding: 0.5rem 1rem;
   background-color: var(--mui-surface);
-  border-radius: var(--mui-border-radius);
   border: 1px solid var(--mui-divider);
-  margin-right: 0.5rem;
+  border-radius: var(--mui-border-radius);
+  cursor: pointer;
+  transition: var(--mui-transition);
+  min-width: 160px;
+  justify-content: space-between;
+}
+
+.dropdown-trigger:hover {
+  background-color: var(--mui-divider);
+}
+
+.user-icon {
+  font-size: 1.25rem;
+  color: var(--mui-primary);
 }
 
 .welcome-text {
@@ -185,11 +257,104 @@
   font-weight: 500;
   color: var(--mui-text-primary);
   white-space: nowrap;
+  flex: 1;
 }
 
-.dark .user-welcome {
+.dropdown-arrow {
+  font-size: 1rem;
+  color: var(--mui-text-secondary);
+  transition: var(--mui-transition);
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: var(--mui-background);
+  border: 1px solid var(--mui-divider);
+  border-radius: var(--mui-border-radius);
+  box-shadow: var(--mui-shadow-2);
+  min-width: 180px;
+  z-index: 1000;
+  overflow: hidden;
+  animation: dropdownSlide 0.2s ease-out;
+}
+
+@keyframes dropdownSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: none;
+  background: transparent;
+  color: var(--mui-text-primary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--mui-transition);
+  text-align: left;
+}
+
+.dropdown-item:hover {
+  background-color: var(--mui-surface);
+}
+
+.dropdown-item .material-symbols-outlined {
+  font-size: 1.1rem;
+}
+
+.admin-item {
+  color: var(--mui-primary);
+  font-weight: 600;
+}
+
+.admin-item:hover {
+  background-color: rgba(17, 115, 212, 0.1);
+}
+
+.logout-item {
+  color: var(--mui-error);
+  border-top: 1px solid var(--mui-divider);
+  margin-top: 0.25rem;
+  padding-top: 1rem;
+}
+
+.logout-item:hover {
+  background-color: rgba(211, 47, 47, 0.1);
+}
+
+.dark .dropdown-trigger {
   background-color: var(--mui-surface);
   border-color: var(--mui-divider);
+}
+
+.dark .dropdown-trigger:hover {
+  background-color: var(--mui-divider);
+}
+
+.dark .dropdown-menu {
+  background-color: var(--mui-surface);
+  border-color: var(--mui-divider);
+}
+
+.dark .dropdown-item:hover {
+  background-color: var(--mui-background);
+}
+
+.dark .logout-item {
+  border-top-color: var(--mui-divider);
 }
 
 .btn {

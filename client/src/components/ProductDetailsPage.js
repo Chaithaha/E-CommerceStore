@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { imageService } from "../utils/imageService";
+import { getProductImageUrl } from "../utils/productUtils";
 import apiClient from "../utils/apiClient";
+import Button from "./common/Button";
 import "./ProductDetailsPage.css";
+import "../styles/common.css";
 
 const ProductDetailsPage = () => {
   const { id } = useParams();
@@ -19,55 +21,15 @@ const ProductDetailsPage = () => {
         setLoading(true);
         setError(null);
 
-        // Try products endpoint first, then fallback to posts endpoint
-        let response;
-        try {
-          response = await apiClient.get(`/api/products/${id}`);
-        } catch (productsError) {
-          console.log(
-            "Products endpoint failed, trying posts endpoint:",
-            productsError,
-          );
-          response = await apiClient.get(`/api/posts/${id}`);
-        }
+        // Use unified items endpoint
+        const response = await apiClient.get(`/api/items/${id}`);
 
         if (response.success) {
           setPost(response.data);
 
-          // Determine the best primary image URL
-          const getPrimaryImageUrl = async () => {
-            try {
-              // If post has a direct image_url (legacy support)
-              if (response.data.image_url) {
-                return response.data.image_url;
-              }
-
-              // If post has images array, use the first one
-              if (response.data.images && response.data.images.length > 0) {
-                const firstImage = response.data.images[0];
-                if (firstImage.publicUrl) {
-                  return firstImage.publicUrl;
-                }
-                if (firstImage.image_url) {
-                  return firstImage.image_url;
-                }
-                // If we have storage path, generate public URL
-                if (firstImage.storage_path) {
-                  return imageService.getPublicUrl(firstImage.storage_path);
-                }
-              }
-
-              // Fallback to null - let the component handle missing images
-              return null;
-            } catch (error) {
-              console.error("Error getting primary image URL:", error);
-              return null;
-            }
-          };
-
           const loadPrimaryImageUrl = async () => {
             setImageLoading(true);
-            const url = await getPrimaryImageUrl();
+            const url = await getProductImageUrl(response.data);
             setPrimaryImageUrl(url);
             setImageLoading(false);
           };
@@ -109,7 +71,7 @@ const ProductDetailsPage = () => {
     return (
       <div className="product-details-loading">
         <div className="loading-spinner"></div>
-        <p>Loading post details...</p>
+        <p>Loading item details...</p>
       </div>
     );
   }
@@ -120,7 +82,7 @@ const ProductDetailsPage = () => {
         <h2>Error</h2>
         <p>{error}</p>
         <button onClick={handleBackClick} className="back-button">
-          Back to Posts
+          Back to Items
         </button>
       </div>
     );
@@ -129,9 +91,9 @@ const ProductDetailsPage = () => {
   if (!post) {
     return (
       <div className="product-details-not-found">
-        <h2>Post Not Found</h2>
+        <h2>Item Not Found</h2>
         <button onClick={handleBackClick} className="back-button">
-          Back to Posts
+          Back to Items
         </button>
       </div>
     );
@@ -140,9 +102,9 @@ const ProductDetailsPage = () => {
   return (
     <div className="product-details-page">
       <div className="back-button-container">
-        <button onClick={handleBackClick} className="back-button">
-          ← Back to Posts
-        </button>
+          <Button variant="secondary" onClick={handleBackClick}>
+           ← Back to Items
+         </Button>
       </div>
 
       <div className="product-details-container">
@@ -176,7 +138,7 @@ const ProductDetailsPage = () => {
                     image.publicUrl ||
                     image.image_url ||
                     (image.storage_path
-                      ? imageService.getPublicUrl(image.storage_path)
+                      ? getProductImageUrl({ images: [image] })
                       : null);
 
                   return imageUrl ? (
@@ -262,9 +224,14 @@ const ProductDetailsPage = () => {
           </div>
 
           <div className="product-actions">
-            <button onClick={handleChatClick} className="chat-button">
+            <Button
+              variant="primary"
+              size="large"
+              fullWidth
+              onClick={handleChatClick}
+            >
               💬 Chat with {post.user?.name || "Seller"}
-            </button>
+            </Button>
           </div>
         </div>
       </div>

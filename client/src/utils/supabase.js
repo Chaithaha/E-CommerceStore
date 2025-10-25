@@ -16,97 +16,21 @@ if (!supabaseUrl || !supabaseKey) {
   });
 }
 
-// Create Supabase client with error handling for missing environment variables
-let supabaseClient = null;
-if (
-  supabaseUrl &&
-  supabaseKey &&
-  supabaseUrl !== "your_supabase_project_url_here" &&
-  supabaseKey !== "your_supabase_anon_key_here"
-) {
-  supabaseClient = createClient(supabaseUrl, supabaseKey, {
-    auth: {
-      persistSession: true,
-      autoRefreshToken: true,
-      detectSessionInUrl: true,
-      storage: window.localStorage, // Explicitly set storage
-      storageKey: "supabase.auth.token", // Custom storage key
+// Create Supabase client
+const supabaseClient = createClient(supabaseUrl, supabaseKey, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: true,
+    storage: window.localStorage, // Explicitly set storage
+    storageKey: "supabase.auth.token", // Custom storage key
+  },
+  realtime: {
+    params: {
+      eventsPerSecond: 10,
     },
-    realtime: {
-      params: {
-        eventsPerSecond: 10,
-      },
-    },
-  });
-} else {
-  // Create a mock client when environment variables are missing or using placeholder values
-  const mockAuth = {
-    signIn: async () => {
-      console.log("Mock auth.signIn called - Supabase not configured");
-      return {
-        data: null,
-        error: {
-          message:
-            "Supabase not configured. Please set REACT_APP_SUPABASE_URL and REACT_APP_SUPABASE_KEY.",
-          code: "SUPABASE_NOT_CONFIGURED",
-        },
-      };
-    },
-    signUp: async () => {
-      console.log("Mock auth.signUp called - Supabase not configured");
-      return {
-        data: null,
-        error: {
-          message:
-            "Supabase not configured. Please set REACT_APP_SUPABASE_URL and REACT_APP_SUPABASE_KEY.",
-          code: "SUPABASE_NOT_CONFIGURED",
-        },
-      };
-    },
-    signOut: async () => {
-      console.log("Mock auth.signOut called - Supabase not configured");
-      return {
-        success: true,
-        data: null,
-        error: null,
-      };
-    },
-    getUser: async () => {
-      console.log("Mock auth.getUser called - Supabase not configured");
-      return {
-        data: { user: null },
-        error: {
-          message:
-            "Supabase not configured. Please set REACT_APP_SUPABASE_URL and REACT_APP_SUPABASE_KEY.",
-          code: "SUPABASE_NOT_CONFIGURED",
-        },
-      };
-    },
-    onAuthStateChange: () => {
-      console.log(
-        "Mock auth.onAuthStateChange called - Supabase not configured",
-      );
-      return {
-        data: {
-          subscription: {
-            unsubscribe: () => {},
-          },
-        },
-      };
-    },
-  };
-
-  supabaseClient = {
-    auth: mockAuth,
-    from: () => ({
-      select: () => ({ error: { message: "Supabase not configured" } }),
-      insert: () => ({ error: { message: "Supabase not configured" } }),
-      update: () => ({ error: { message: "Supabase not configured" } }),
-      delete: () => ({ error: { message: "Supabase not configured" } }),
-      eq: () => ({ error: { message: "Supabase not configured" } }),
-    }),
-  };
-}
+  },
+});
 
 // Error handling utilities
 export const handleSupabaseError = (error) => {

@@ -6,6 +6,7 @@ import apiClient from "../utils/apiClient";
 import LoadingSpinner from "./common/LoadingSpinner";
 import ErrorMessage from "./common/ErrorMessage";
 import Header from "./Header";
+import ProductCard from "./ProductCard";
 import "../NewLandingPage.css";
 
 const LandingPage = () => {
@@ -26,7 +27,7 @@ const LandingPage = () => {
       try {
         setLoading(true);
         setError(null);
-        const response = await apiClient.get("/api/products");
+        const response = await apiClient.get("/api/items");
         if (response.success) {
           setProducts(response.data);
         } else {
@@ -59,7 +60,7 @@ const LandingPage = () => {
       setLoading(true);
       setError(null);
       const response = await apiClient.get(
-        `/api/products/search?q=${encodeURIComponent(searchQuery)}`,
+        `/api/items?search=${encodeURIComponent(searchQuery)}`,
       );
       if (response.success) {
         setProducts(response.data);
@@ -75,12 +76,6 @@ const LandingPage = () => {
 
   const handleViewDetails = (productId) => {
     navigate(`/product/${productId}`);
-  };
-
-  const getBatteryHealthColor = (health) => {
-    if (health >= 90) return "metric-battery";
-    if (health >= 80) return "metric-value";
-    return "metric-score";
   };
 
   return (
@@ -153,52 +148,11 @@ const LandingPage = () => {
                   </div>
                 ) : (
                   products.map((product) => (
-                    <div key={product.id} className="product-card">
-                      <div
-                        className="product-image"
-                        style={{
-                          backgroundImage:
-                            product.images && product.images.length > 0
-                              ? `url("${product.images[0].publicUrl || product.images[0].image_url}")`
-                              : "none",
-                        }}
-                      >
-                        {!product.images ||
-                          (product.images.length === 0 && (
-                            <div className="product-image-placeholder">
-                              <span>No image</span>
-                            </div>
-                          ))}
-                      </div>
-                      <div className="product-content">
-                        <h3 className="product-name">{product.title}</h3>
-                        <p className="product-price">${product.price}</p>
-                        <div className="product-metrics">
-                          <p
-                            className={`metric ${getBatteryHealthColor(product.battery_health || 0)}`}
-                          >
-                            <span className="metric-label">
-                              Battery Health:
-                            </span>{" "}
-                            {product.battery_health || 0}%
-                          </p>
-                          <p className="metric metric-value">
-                            <span className="metric-label">Market Value:</span>{" "}
-                            ${product.market_value || 0}
-                          </p>
-                          <p className="metric metric-score">
-                            <span className="metric-label">Seller Score:</span>{" "}
-                            {product.seller_score || 0}
-                          </p>
-                        </div>
-                        <button
-                          className="product-btn"
-                          onClick={() => handleViewDetails(product.id)}
-                        >
-                          <span>View Details</span>
-                        </button>
-                      </div>
-                    </div>
+                    <ProductCard
+                      key={product.id}
+                      product={product}
+                      onViewDetails={handleViewDetails}
+                    />
                   ))
                 )}
               </div>

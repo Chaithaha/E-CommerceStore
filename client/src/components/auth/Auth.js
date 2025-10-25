@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
-import Login from "./Login";
-import Signup from "./Signup";
 import "./auth.css";
 
 const Auth = ({ onAuthSuccess }) => {
@@ -95,14 +93,17 @@ const Auth = ({ onAuthSuccess }) => {
       </div>
 
       <div className="auth-form-wrapper">
-        {isLoginMode ? (
-          <Login onToggleMode={toggleMode} onLoginSuccess={handleAuthSuccess} />
-        ) : (
-          <Signup
-            onToggleMode={toggleMode}
-            onSignupSuccess={handleAuthSuccess}
-          />
-        )}
+        <div className="auth-form">
+          <h2>{isLoginMode ? "Sign In" : "Sign Up"}</h2>
+          <p>{isLoginMode ? "Welcome back! Please sign in to your account." : "Create your account to get started"}</p>
+          
+          <button 
+            className="toggle-auth-button"
+            onClick={toggleMode}
+          >
+            {isLoginMode ? "Need an account? Sign Up" : "Already have an account? Sign In"}
+          </button>
+        </div>
       </div>
     </div>
   );
