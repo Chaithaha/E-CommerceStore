@@ -416,8 +416,8 @@ main {
 
 .products-grid {
   display: grid;
-  grid-template-columns: repeat(5, 320px);
-  gap: 3.5rem;
+  grid-template-columns: repeat(5, 280px);
+  gap: 1.5rem;
   padding: 1rem 1rem 1rem 0;
   width: 100%;
   justify-content: start;
