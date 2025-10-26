@@ -84,12 +84,10 @@ const Auth = ({ onAuthSuccess }) => {
         }
 
         // Call server signup API
-        const response = await apiClient.post("/api/auth/signup", {
+        const response = await apiClient.post("/api/auth/register", {
           email: formData.email,
           password: formData.password,
-          metadata: {
-            full_name: formData.username,
-          },
+          full_name: formData.username,
         });
 
         if (response.success) {

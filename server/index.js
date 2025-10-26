@@ -88,7 +88,7 @@ const postsRouter = require('./routes/posts');
 const itemsRouter = require('./routes/items');
 const imagesRouter = require('./routes/images');
 const testImagesRouter = require('./routes/test-images');
-const authRouter = require('./routes/auth-simple');
+const authRouter = require('./routes/auth');
 const diagnosticsRouter = require('./routes/diagnostics');
 const marketValueRouter = require('./routes/marketValue');
 const { authenticateToken } = require('./middleware/auth');
@@ -187,7 +187,7 @@ app.get('/api/verify-supabase', async (req, res) => {
     let clientError = null;
     try {
       const client = getSupabaseClient();
-      const { data, error } = await client.from('pg_catalog.pg_tables').select('tablename').limit(1);
+      const { data, error } = await client.from('profiles').select('id').limit(1);
       if (error) throw error;
       clientStatus = 'SUCCESS';
     } catch (error) {
@@ -199,7 +199,7 @@ app.get('/api/verify-supabase', async (req, res) => {
     let serviceClientError = null;
     try {
       const serviceClient = getSupabaseServiceClient();
-      const { data, error } = await serviceClient.from('pg_catalog.pg_tables').select('tablename').limit(1);
+      const { data, error } = await serviceClient.from('profiles').select('id').limit(1);
       if (error) throw error;
       serviceClientStatus = 'SUCCESS';
     } catch (error) {

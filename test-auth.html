@@ -22,7 +22,7 @@
                 
                 // Test signup
                 log('1. Testing signup...');
-                const signupResponse = await fetch(API_URL + '/api/auth/signup', {
+                const signupResponse = await fetch(API_URL + '/api/auth/register', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -30,9 +30,7 @@
                     body: JSON.stringify({
                         email: 'testuser@example.com',
                         password: 'test123456',
-                        metadata: {
-                            full_name: 'Test User'
-                        }
+                        full_name: 'Test User'
                     })
                 });
                 
