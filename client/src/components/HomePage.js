@@ -6,6 +6,7 @@ import ErrorMessage from "./common/ErrorMessage";
 import Header from "./Header";
 import ProductCard from "./ProductCard";
 import AuthDebug from "./AuthDebug";
+import AuthPopup from "./common/AuthPopup";
 import "../NewLandingPage.css";
 
 const HomePage = ({ isDarkMode, setIsDarkMode }) => {
@@ -16,6 +17,19 @@ const HomePage = ({ isDarkMode, setIsDarkMode }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [showAuthPopup, setShowAuthPopup] = useState(false);
+  const [hasMounted, setHasMounted] = useState(false);
+
+  // Handle authentication popup - only show after initial mount
+  useEffect(() => {
+    if (!hasMounted) {
+      setHasMounted(true);
+      return;
+    }
+
+    // Show popup when authentication state changes
+    setShowAuthPopup(true);
+  }, [isAuthenticated, hasMounted]);
 
   // Fetch products when component mounts, when page gains focus, or when location changes
   useEffect(() => {
@@ -170,37 +184,6 @@ const HomePage = ({ isDarkMode, setIsDarkMode }) => {
             {/* Hero Section */}
             <div className="hero">
               <div className="hero-content">
-                {/* Authentication Status Display */}
-                {isAuthenticated ? (
-                  <div
-                    style={{
-                      backgroundColor: "#4CAF50",
-                      color: "white",
-                      padding: "8px 16px",
-                      borderRadius: "4px",
-                      marginBottom: "16px",
-                      fontSize: "14px",
-                      textAlign: "center",
-                    }}
-                  >
-                    ✅ Authenticated as: {user?.email || user?.name || "User"}
-                  </div>
-                ) : (
-                  <div
-                    style={{
-                      backgroundColor: "#f44336",
-                      color: "white",
-                      padding: "8px 16px",
-                      borderRadius: "4px",
-                      marginBottom: "16px",
-                      fontSize: "14px",
-                      textAlign: "center",
-                    }}
-                  >
-                    ⚠️ Not authenticated - Please log in to create posts
-                  </div>
-                )}
-
                 <h1 className="hero-title">
                   ForOranges. Verified. Transparent.
                 </h1>
@@ -280,6 +263,14 @@ const HomePage = ({ isDarkMode, setIsDarkMode }) => {
           </div>
         </main>
       </div>
+
+      {/* Authentication Popup */}
+      <AuthPopup
+        isAuthenticated={isAuthenticated}
+        username={user?.email || ""}
+        isVisible={showAuthPopup}
+        onClose={() => setShowAuthPopup(false)}
+      />
     </div>
   );
 };

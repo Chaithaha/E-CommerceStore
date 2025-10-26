@@ -58,7 +58,7 @@
 /* Full-width sections */
 .post-form .form-group:first-child,
 .post-form .form-group:nth-child(2),
-.post-form .form-group:nth-child(8),
+.post-form .form-group:nth-child(9),
 .post-form .form-actions {
   grid-column: 1 / -1;
 }
@@ -305,7 +305,7 @@
   /* Reset full-width sections for mobile */
   .post-form .form-group:first-child,
   .post-form .form-group:nth-child(2),
-  .post-form .form-group:nth-child(8),
+  .post-form .form-group:nth-child(9),
   .post-form .form-actions {
     grid-column: 1;
   }

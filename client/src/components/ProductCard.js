@@ -6,6 +6,7 @@ import {
   getBatteryHealthColor,
   getBatteryHealthLabel,
 } from "../utils/productUtils";
+import { getProductFields } from "../utils/localProductStorage";
 import { useImageFallback } from "../utils/imageFallback";
 import Button from "./common/Button";
 import "./ProductCard.css";
@@ -18,11 +19,11 @@ const ProductCard = ({ product, onViewDetails }) => {
   const [imageError, setImageError] = React.useState(false);
   const [imageUrl, setImageUrl] = React.useState(null);
   const [imageDebugInfo, setImageDebugInfo] = React.useState(null);
+  const [additionalFields, setAdditionalFields] = React.useState({});
   const {
     fallbackUrl,
     isUsingFallback,
     handleImageError: handleFallbackError,
-    resetFallback,
   } = useImageFallback(product);
 
   React.useEffect(() => {
@@ -77,6 +78,24 @@ const ProductCard = ({ product, onViewDetails }) => {
         });
       }
     };
+
+    // Load additional fields from localStorage
+    const storedFields = getProductFields(product.id);
+    console.log("📦 Loading additional fields for product:", {
+      productId: product.id,
+      storedFields: storedFields,
+      hasBatteryHealth: !!storedFields.battery_health,
+      hasMarketValue: !!storedFields.market_value,
+    });
+
+    // Also check localStorage directly for debugging
+    const allStoredData = JSON.parse(
+      localStorage.getItem("productAdditionalFields") || "{}",
+    );
+    console.log("🔍 Debug - All stored data in localStorage:", allStoredData);
+    console.log("🔍 Debug - Data for this product:", allStoredData[product.id]);
+
+    setAdditionalFields(storedFields);
 
     loadImageUrl();
   }, [product]);
@@ -173,21 +192,15 @@ const ProductCard = ({ product, onViewDetails }) => {
           <div className="product-detail-item">
             <span className="detail-label">Battery Health:</span>
             <span
-              className={`detail-value ${getBatteryHealthColor(product.battery_health || 0)}`}
+              className={`detail-value ${getBatteryHealthColor(additionalFields.battery_health || 0)}`}
             >
-              {product.battery_health || 0}%
+              {additionalFields.battery_health || 0}%
             </span>
           </div>
           <div className="product-detail-item">
             <span className="detail-label">Market Value:</span>
             <span className="detail-value market-value">
-              ${product.market_value || 0}
-            </span>
-          </div>
-          <div className="product-detail-item">
-            <span className="detail-label">Seller Score:</span>
-            <span className="detail-value seller-score">
-              {product.seller_score || 0}
+              ${additionalFields.market_value?.toFixed(2) || "0.00"}
             </span>
           </div>
         </div>

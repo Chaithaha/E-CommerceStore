@@ -4,6 +4,7 @@ import { useAuth } from "../contexts/AuthContext";
 import Button from "./common/Button";
 import ErrorMessage from "./common/ErrorMessage";
 import apiClient from "../utils/apiClient";
+import { storeProductFields } from "../utils/localProductStorage";
 import "./CreatePost.css";
 
 const CreatePost = () => {
@@ -28,6 +29,7 @@ const CreatePost = () => {
     condition: "good",
     battery_health: "",
     date_bought: "",
+    market_value: "",
   });
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [previewUrls, setPreviewUrls] = useState([]);
@@ -133,11 +135,53 @@ const CreatePost = () => {
         postData.battery_health = parseInt(formData.battery_health);
       }
 
+      // Convert market_value to number if provided
+      if (formData.market_value) {
+        postData.market_value = parseFloat(formData.market_value);
+      }
+
       console.log("Sending post data to server:", postData);
       const response = await apiClient.post("/api/items", postData);
       console.log("Server response:", response);
 
       if (response.success) {
+        // Store additional fields locally for frontend use
+        const additionalFields = {
+          battery_health: formData.battery_health
+            ? parseInt(formData.battery_health)
+            : null,
+          market_value: formData.market_value
+            ? parseFloat(formData.market_value)
+            : null,
+        };
+
+        // Get the product ID from the response
+        const productId = response.data?.id;
+        console.log("🔍 Debug - Full API response:", response);
+        console.log("🔍 Debug - Response data:", response.data);
+        console.log("🔍 Debug - Extracted product ID:", productId);
+
+        if (productId) {
+          console.log("💾 Storing additional fields for product:", {
+            productId: productId,
+            additionalFields: additionalFields,
+          });
+          storeProductFields(productId, additionalFields);
+
+          // Verify storage worked
+          setTimeout(() => {
+            const storedFields = JSON.parse(
+              localStorage.getItem("productAdditionalFields") || "{}",
+            );
+            console.log(
+              "✅ Verification - Stored fields in localStorage:",
+              storedFields[productId],
+            );
+          }, 100);
+        } else {
+          console.warn("⚠️ No product ID found in response:", response);
+        }
+
         console.log("Post created successfully, navigating to home");
         navigate("/home");
       } else {
@@ -261,6 +305,20 @@ const CreatePost = () => {
               value={formData.date_bought}
               onChange={handleInputChange}
               max={new Date().toISOString().split("T")[0]}
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="market_value">Market Value ($)</label>
+            <input
+              type="number"
+              id="market_value"
+              name="market_value"
+              value={formData.market_value}
+              onChange={handleInputChange}
+              placeholder="Enter estimated market value"
+              min="0"
+              step="0.01"
             />
           </div>
 

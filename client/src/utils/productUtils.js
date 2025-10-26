@@ -103,3 +103,81 @@ export const getStockStatus = (stock = 1) => {
   if (stock <= 10) return `${stock} available`;
   return "In stock";
 };
+
+/**
+ * Calculate battery health based on product attributes
+ * @param {Object} product - Product object
+ * @returns {number} - Calculated battery health percentage
+ */
+export const calculateBatteryHealth = (product) => {
+  // If battery_health exists in the data, use it
+  if (product.battery_health !== undefined && product.battery_health !== null) {
+    return parseInt(product.battery_health);
+  }
+
+  // For electronics, estimate based on category and age
+  if (product.category === "electronics") {
+    const createdAt = new Date(product.created_at);
+    const now = new Date();
+    const daysOld = Math.floor((now - createdAt) / (1000 * 60 * 60 * 24));
+
+    // Assume battery health decreases by 1% per month for electronics
+    const monthsOld = daysOld / 30;
+    const estimatedHealth = Math.max(50, 100 - monthsOld * 2);
+
+    return Math.round(estimatedHealth);
+  }
+
+  // For non-electronics, return a default value
+  return 85;
+};
+
+/**
+ * Calculate market value based on product attributes
+ * @param {Object} product - Product object
+ * @returns {number} - Calculated market value
+ */
+export const calculateMarketValue = (product) => {
+  // If market_value exists in the data, use it
+  if (product.market_value !== undefined && product.market_value !== null) {
+    return parseFloat(product.market_value);
+  }
+
+  const basePrice = parseFloat(product.price) || 0;
+  const category = product.category || "electronics";
+  const condition = product.condition || "good";
+  const batteryHealth = calculateBatteryHealth(product);
+
+  // Base multiplier by category
+  const categoryMultipliers = {
+    electronics: 1.2,
+    clothing: 0.8,
+    home: 1.0,
+    sports: 1.1,
+    books: 0.6,
+    other: 0.9,
+  };
+
+  // Condition multiplier
+  const conditionMultipliers = {
+    new: 1.3,
+    "like-new": 1.2,
+    good: 1.0,
+    fair: 0.8,
+    poor: 0.6,
+  };
+
+  // Battery health multiplier (for electronics)
+  const batteryMultiplier =
+    category === "electronics" ? batteryHealth / 100 : 1.0;
+
+  const categoryMultiplier = categoryMultipliers[category] || 1.0;
+  const conditionMultiplier = conditionMultipliers[condition] || 1.0;
+
+  // Calculate market value
+  const marketValue =
+    basePrice * categoryMultiplier * conditionMultiplier * batteryMultiplier;
+
+  // Round to 2 decimal places
+  return Math.round(marketValue * 100) / 100;
+};
