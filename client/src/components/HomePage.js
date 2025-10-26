@@ -86,33 +86,6 @@ const HomePage = ({ isDarkMode, setIsDarkMode }) => {
     };
   }, [location.key]); // Add location.key as dependency to refresh on navigation
 
-  const refreshProducts = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
-      const response = await fetch(`${API_URL}/api/items`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setProducts(data);
-      } else {
-        setError(data.error || "Failed to fetch products");
-      }
-    } catch (err) {
-      setError("Network error. Please try again later.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleSearch = async (e) => {
     e.preventDefault();
     if (!searchQuery.trim()) return;
@@ -210,15 +183,6 @@ const HomePage = ({ isDarkMode, setIsDarkMode }) => {
                     </button>
                   </div>
                 </form>
-
-                <div className="advanced-filter">
-                  <button className="advanced-btn">
-                    <span>Advanced Diagnostics Filter</span>
-                    <span className="material-symbols-outlined advanced-icon">
-                      expand_more
-                    </span>
-                  </button>
-                </div>
               </div>
             </div>
 
@@ -226,14 +190,6 @@ const HomePage = ({ isDarkMode, setIsDarkMode }) => {
             <div className="products-section">
               <div className="products-header">
                 <h2>Latest Listings</h2>
-                <button
-                  onClick={refreshProducts}
-                  className="refresh-btn"
-                  disabled={loading}
-                >
-                  <span className="material-symbols-outlined">refresh</span>
-                  Refresh
-                </button>
               </div>
               <div className="products-grid">
                 {loading ? (

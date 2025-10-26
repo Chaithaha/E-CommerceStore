@@ -4,8 +4,8 @@ import { useAuth } from "../contexts/AuthContext";
 import {
   getProductImageUrl,
   getBatteryHealthColor,
-  getBatteryHealthLabel,
 } from "../utils/productUtils";
+import { getProductFields } from "../utils/localProductStorage";
 import apiClient from "../utils/apiClient";
 import Header from "./Header";
 import Button from "./common/Button";
@@ -23,24 +23,12 @@ const ProductDetailsPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [imageLoading, setImageLoading] = useState(true);
+  const [additionalFields, setAdditionalFields] = useState({});
 
   // Check for dark mode on mount
   useEffect(() => {
-    const checkDarkMode = () => {
-      const isDark = document.documentElement.classList.contains("dark");
-      setIsDarkMode(isDark);
-    };
-
-    checkDarkMode();
-
-    // Listen for dark mode changes
-    const observer = new MutationObserver(checkDarkMode);
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["class"],
-    });
-
-    return () => observer.disconnect();
+    const isDark = document.documentElement.classList.contains("dark");
+    setIsDarkMode(isDark);
   }, []);
 
   const handleLogout = async () => {
@@ -66,13 +54,13 @@ const ProductDetailsPage = () => {
         if (response.success) {
           setPost(response.data);
 
+          // Load primary image URL
           const loadPrimaryImageUrl = async () => {
             setImageLoading(true);
             const url = await getProductImageUrl(response.data);
             setPrimaryImageUrl(url);
             setImageLoading(false);
           };
-
           loadPrimaryImageUrl();
         } else {
           if (response.error?.includes("404")) {
@@ -92,6 +80,12 @@ const ProductDetailsPage = () => {
     };
 
     fetchPost();
+  }, [id]);
+
+  // Load additional fields from localStorage
+  useEffect(() => {
+    const storedFields = getProductFields(id);
+    setAdditionalFields(storedFields);
   }, [id]);
 
   const handleBackClick = () => {
@@ -218,11 +212,17 @@ const ProductDetailsPage = () => {
               <h1 className="product-name">{post.title}</h1>
               <div className="product-price-section">
                 <div className="product-price">${post.price}</div>
-                {post.battery_health && (
+                {(additionalFields.battery_health || post.battery_health) && (
                   <div
-                    className={`status-chip ${getBatteryHealthColor(post.battery_health)}`}
+                    className={`status-chip ${getBatteryHealthColor(additionalFields.battery_health || post.battery_health)}`}
                   >
-                    {getBatteryHealthLabel(post.battery_health)} Battery
+                    {additionalFields.battery_health || post.battery_health > 80
+                      ? "Good"
+                      : additionalFields.battery_health ||
+                          post.battery_health > 50
+                        ? "Medium"
+                        : "Poor"}{" "}
+                    Battery
                   </div>
                 )}
               </div>
@@ -230,23 +230,36 @@ const ProductDetailsPage = () => {
 
             {/* Product Details in requested format */}
             <div className="product-details">
-              {post.battery_health !== undefined &&
-                post.battery_health !== null && (
-                  <div className="product-detail-item">
-                    <span className="detail-label">Battery Health:</span>
-                    <span
-                      className={`detail-value ${getBatteryHealthColor(post.battery_health || 0)}`}
-                    >
-                      {post.battery_health}%
-                    </span>
-                  </div>
-                )}
+              {/* Show battery health if available */}
+              {(additionalFields.battery_health || post.battery_health) && (
+                <div className="product-detail-item">
+                  <span className="detail-label">Battery Health:</span>
+                  <span
+                    className={`detail-value ${getBatteryHealthColor(additionalFields.battery_health || post.battery_health || 0)}`}
+                  >
+                    {additionalFields.battery_health ||
+                      post.battery_health ||
+                      0}
+                    %
+                  </span>
+                </div>
+              )}
 
               {post.date_bought && (
                 <div className="product-detail-item">
                   <span className="detail-label">Date Bought:</span>
                   <span className="detail-value">
                     {new Date(post.date_bought).toLocaleDateString()}
+                  </span>
+                </div>
+              )}
+
+              {/* Show market value if available */}
+              {additionalFields.market_value && (
+                <div className="product-detail-item">
+                  <span className="detail-label">Market Value:</span>
+                  <span className="detail-value market-value">
+                    ${additionalFields.market_value.toFixed(2)}
                   </span>
                 </div>
               )}
@@ -268,11 +281,9 @@ const ProductDetailsPage = () => {
               <div className="product-detail-item">
                 <span className="detail-label">Posted:</span>
                 <span className="detail-value">
-                  {post.posted
-                    ? new Date(post.posted).toLocaleDateString()
-                    : post.created_at
-                      ? new Date(post.created_at).toLocaleDateString()
-                      : new Date().toLocaleDateString()}
+                  {new Date(
+                    post.posted || post.created_at || Date.now(),
+                  ).toLocaleDateString()}
                 </span>
               </div>
             </div>

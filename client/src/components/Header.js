@@ -99,9 +99,9 @@ const Header = ({
         </div>
         <div className="nav-section">
           <div className="nav-links">
-            <a href="/categories">Shop by Category</a>
-            <a href="/how-it-works">How it Works</a>
-            <a href="/about">About Us</a>
+            {/* <a href="/categories">Shop by Category</a> */}
+            {/* <a href="/how-it-works">How it Works</a> */}
+            {/* <a href="/about">About Us</a> */}
           </div>
         </div>
         <div className="action-buttons">
