@@ -93,7 +93,9 @@ const Header = ({
     <header className="header">
       <div className="header-main">
         <div className="logo-section">
-          <h2 className="logo-text">🍊 ForOranges</h2>
+          <a href="/home" className="logo-link">
+            <h2 className="logo-text">🍊 ForOranges</h2>
+          </a>
         </div>
         <div className="nav-section">
           <div className="nav-links">

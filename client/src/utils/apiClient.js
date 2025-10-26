@@ -1,45 +1,22 @@
+import { supabase } from "./supabase";
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
-// Helper function to get the current authentication token
-const getAuthToken = () => {
+// Helper function to get the current authentication token from Supabase
+const getAuthToken = async () => {
   try {
-    // First check for server authentication token (highest priority)
-    const serverToken = localStorage.getItem("access_token");
-    if (serverToken) {
-      return serverToken;
+    // Get current session from Supabase
+    const { data: { session }, error } = await supabase.auth.getSession();
+    
+    if (error) {
+      console.error("Error getting auth token:", error);
+      return null;
     }
-
-    // Fallback to Supabase tokens for backward compatibility
-    const possibleKeys = [
-      "supabase.auth.token",
-      "supabase.session",
-      "auth:token",
-    ];
-
-    for (const key of possibleKeys) {
-      const token = localStorage.getItem(key);
-      if (token) {
-        try {
-          const parsedToken = JSON.parse(token);
-          // Try different possible structures for the access token
-          if (parsedToken?.currentSession?.access_token) {
-            return parsedToken.currentSession.access_token;
-          }
-          if (parsedToken?.access_token) {
-            return parsedToken.access_token;
-          }
-          if (parsedToken?.session?.access_token) {
-            return parsedToken.session.access_token;
-          }
-        } catch (parseError) {
-          // Continue to next key if parsing fails
-        }
-      }
-    }
+    
+    return session?.access_token || null;
   } catch (error) {
-    // Silently handle errors
+    console.error("Error getting auth token:", error);
+    return null;
   }
-  return null;
 };
 
 const apiClient = {
@@ -50,7 +27,7 @@ const apiClient = {
       };
 
       // Add authorization header if token exists
-      const token = getAuthToken();
+      const token = await getAuthToken();
       if (token) {
         headers["Authorization"] = `Bearer ${token}`;
       }
@@ -78,7 +55,7 @@ const apiClient = {
       };
 
       // Add authorization header if token exists
-      const token = getAuthToken();
+      const token = await getAuthToken();
       if (token) {
         headers["Authorization"] = `Bearer ${token}`;
       }
@@ -111,7 +88,7 @@ const apiClient = {
       };
 
       // Add authorization header if token exists
-      const token = getAuthToken();
+      const token = await getAuthToken();
       if (token) {
         headers["Authorization"] = `Bearer ${token}`;
       }
@@ -143,7 +120,7 @@ const apiClient = {
       };
 
       // Add authorization header if token exists
-      const token = getAuthToken();
+      const token = await getAuthToken();
       if (token) {
         headers["Authorization"] = `Bearer ${token}`;
       }

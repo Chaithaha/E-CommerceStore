@@ -45,12 +45,10 @@ const AuthDebug = () => {
         </div>
       )}
       <div>
-        <strong>LocalStorage Token:</strong>{" "}
-        {localStorage.getItem("access_token") ? "Present" : "Missing"}
+        <strong>Auth Method:</strong> Direct Supabase Authentication
       </div>
       <div>
-        <strong>LocalStorage User:</strong>{" "}
-        {localStorage.getItem("user_data") ? "Present" : "Missing"}
+        <strong>Session Management:</strong> Handled by Supabase SDK
       </div>
     </div>
   );

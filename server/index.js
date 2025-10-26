@@ -82,7 +82,6 @@ app.use(morgan('combined'));
 app.use(express.json({ limit: '50mb' }));
 app.use('/uploads', express.static('uploads'));
 
-const productsRouter = require('./routes/products');
 const usersRouter = require('./routes/users');
 const postsRouter = require('./routes/posts');
 const itemsRouter = require('./routes/items');
@@ -95,7 +94,6 @@ const { authenticateToken } = require('./middleware/auth');
 
 // Public routes (no authentication required)
 app.use('/api/auth', authRouter);
-app.use('/api/products', productsRouter);
 
 // Protected routes (authentication required)
 app.use('/api/users', authenticateToken, usersRouter);

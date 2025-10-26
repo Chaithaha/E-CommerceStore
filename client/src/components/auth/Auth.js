@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import Button from "../common/Button";
 import ErrorMessage from "../common/ErrorMessage";
-import apiClient from "../../utils/apiClient";
+import { supabase } from "../../utils/supabase";
 import "./auth.css";
 
 const Auth = ({ onAuthSuccess }) => {
@@ -17,7 +17,7 @@ const Auth = ({ onAuthSuccess }) => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { user, authLoading, refreshAuth } = useAuth();
+  const { user, authLoading } = useAuth();
 
   // Handle mode toggle
   const toggleMode = () => {
@@ -48,26 +48,19 @@ const Auth = ({ onAuthSuccess }) => {
 
     try {
       if (isLoginMode) {
-        // Login mode - call server API
+        // Login mode - use direct Supabase authentication
         const email = formData.email || formData.username;
-        const response = await apiClient.post("/api/auth/login", {
+        const { error } = await supabase.auth.signInWithPassword({
           email,
           password: formData.password,
         });
 
-        if (response.success) {
-          // Store authentication data
-          localStorage.setItem("access_token", response.data.data.token);
-          localStorage.setItem(
-            "user_data",
-            JSON.stringify(response.data.data.user),
-          );
-
-          // Force refresh AuthContext state
-          await refreshAuth();
-          handleAuthSuccess();
+        if (error) {
+          setError(error.message || "Login failed");
         } else {
-          setError(response.error || "Login failed");
+          // Supabase automatically handles session storage
+          // AuthContext will detect the state change via onAuthStateChange
+          handleAuthSuccess();
         }
       } else {
         // Register mode
@@ -83,39 +76,36 @@ const Auth = ({ onAuthSuccess }) => {
           return;
         }
 
-        // Call server signup API
-        const response = await apiClient.post("/api/auth/register", {
+        // Use direct Supabase signup
+        const { data, error } = await supabase.auth.signUp({
           email: formData.email,
           password: formData.password,
-          full_name: formData.username,
+          options: {
+            data: {
+              full_name: formData.username
+            }
+          }
         });
 
-        if (response.success) {
-          // For signup, we might need to login immediately if email confirmation is bypassed
-          const loginResponse = await apiClient.post("/api/auth/login", {
-            email: formData.email,
-            password: formData.password,
-          });
-
-          if (loginResponse.success) {
-            // Store authentication data
-            localStorage.setItem("access_token", loginResponse.data.data.token);
-            localStorage.setItem(
-              "user_data",
-              JSON.stringify(loginResponse.data.data.user),
-            );
-
-            // Force refresh AuthContext state
-            await refreshAuth();
-            handleAuthSuccess();
-          } else {
-            // If auto-login fails, still show success but user needs to login manually
-            setError(
-              "Account created successfully. Please login with your credentials.",
-            );
-          }
+        if (error) {
+          setError(error.message || "Registration failed");
         } else {
-          setError(response.error || "Registration failed");
+          // Check if user needs email confirmation
+          if (data.user && !data.user.email_confirmed_at) {
+            setError("Account created successfully. Please check your email to confirm your account, then login.");
+          } else {
+            // Auto-login if email confirmation is bypassed
+            const { error: loginError } = await supabase.auth.signInWithPassword({
+              email: formData.email,
+              password: formData.password,
+            });
+
+            if (loginError) {
+              setError("Account created successfully. Please login with your credentials.");
+            } else {
+              handleAuthSuccess();
+            }
+          }
         }
       }
     } catch (err) {

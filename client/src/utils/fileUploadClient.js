@@ -1,60 +1,29 @@
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+import { supabase } from "./supabase";
 
-// Helper function to get the current authentication token
-const getAuthToken = () => {
+// Helper function to get the current authentication token from Supabase
+const getAuthToken = async () => {
   try {
-    // Try multiple possible locations where Supabase might store the token
-    const possibleKeys = [
-      "supabase.auth.token",
-      "supabase.session",
-      "auth:token",
-    ];
-
-    for (const key of possibleKeys) {
-      const token = localStorage.getItem(key);
-      if (token) {
-        try {
-          const parsedToken = JSON.parse(token);
-          // Try different possible structures for the access token
-          if (parsedToken?.currentSession?.access_token) {
-            console.log(
-              `Found token from ${key}:`,
-              parsedToken.currentSession.access_token.substring(0, 20) + "...",
-            );
-            return parsedToken.currentSession.access_token;
-          }
-          if (parsedToken?.access_token) {
-            console.log(
-              `Found token from ${key}:`,
-              parsedToken.access_token.substring(0, 20) + "...",
-            );
-            return parsedToken.access_token;
-          }
-          if (parsedToken?.session?.access_token) {
-            console.log(
-              `Found token from ${key}:`,
-              parsedToken.session.access_token.substring(0, 20) + "...",
-            );
-            return parsedToken.session.access_token;
-          }
-        } catch (parseError) {
-          console.log(`Failed to parse token from ${key}:`, parseError);
-        }
-      }
+    // Get current session from Supabase
+    const { data: { session }, error } = await supabase.auth.getSession();
+    
+    if (error) {
+      console.error("Error getting auth token:", error);
+      return null;
     }
-
-    // Also check for direct access token storage
-    const directToken = localStorage.getItem("access_token");
-    if (directToken) {
-      console.log(`Found direct token:`, directToken.substring(0, 20) + "...");
-      return directToken;
+    
+    const token = session?.access_token;
+    if (token) {
+      console.log("Found Supabase token:", token.substring(0, 20) + "...");
+    } else {
+      console.log("No auth token found in Supabase session");
     }
-
-    console.log("No auth token found in localStorage");
+    
+    return token || null;
   } catch (error) {
     console.error("Error getting auth token:", error);
+    return null;
   }
-  return null;
 };
 
 // Helper function to convert file to base64
@@ -84,7 +53,7 @@ const fileUploadClient = {
       const headers = {};
 
       // Add authorization header if token exists
-      const token = getAuthToken();
+      const token = await getAuthToken();
       if (token) {
         headers["Authorization"] = `Bearer ${token}`;
       }
@@ -200,7 +169,7 @@ const fileUploadClient = {
       };
 
       // Add authorization header if token exists
-      const token = getAuthToken();
+      const token = await getAuthToken();
       if (token) {
         headers["Authorization"] = `Bearer ${token}`;
       }
@@ -270,7 +239,7 @@ const fileUploadClient = {
       };
 
       // Add authorization header if token exists
-      const token = getAuthToken();
+      const token = await getAuthToken();
       if (token) {
         headers["Authorization"] = `Bearer ${token}`;
       }

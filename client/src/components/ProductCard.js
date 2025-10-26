@@ -151,7 +151,7 @@ const ProductCard = ({ product, onViewDetails }) => {
       </div>
 
       <div className="product-content">
-<div className="product-header">
+        <div className="product-header">
           <h3 className="product-title">{product.title}</h3>
           <div className="product-category">
             {product.category || "Electronics"}
@@ -204,42 +204,44 @@ const ProductCard = ({ product, onViewDetails }) => {
         </Button>
 
         {/* Debug button - only visible in development */}
-        {process.env.NODE_ENV === "development" && user && (user.email === "admin@example.com" || user.role === "admin") && (
-          <button
-            className="debug-button"
-            onClick={() => {
-              console.log("🔍 Product Card Debug Info:", {
-                product,
-                imageUrl,
-                imageDebugInfo,
-                imageLoaded,
-                imageError,
-              });
+        {process.env.NODE_ENV === "development" &&
+          user &&
+          (user.email === "admin@example.com" || user.role === "admin") && (
+            <button
+              className="debug-button"
+              onClick={() => {
+                console.log("🔍 Product Card Debug Info:", {
+                  product,
+                  imageUrl,
+                  imageDebugInfo,
+                  imageLoaded,
+                  imageError,
+                });
 
-              // Test image loading manually
-              if (imageUrl) {
-                const testImg = new Image();
-                testImg.onload = () =>
-                  console.log("✅ Manual image test successful");
-                testImg.onerror = (e) =>
-                  console.error("❌ Manual image test failed:", e);
-                testImg.src = imageUrl;
-              }
-            }}
-            style={{
-              marginTop: "8px",
-              padding: "4px 8px",
-              fontSize: "12px",
-              backgroundColor: "#ff6b6b",
-              color: "white",
-              border: "none",
-              borderRadius: "4px",
-              cursor: "pointer",
-            }}
-          >
-            Debug Image
-          </button>
-        )}
+                // Test image loading manually
+                if (imageUrl) {
+                  const testImg = new Image();
+                  testImg.onload = () =>
+                    console.log("✅ Manual image test successful");
+                  testImg.onerror = (e) =>
+                    console.error("❌ Manual image test failed:", e);
+                  testImg.src = imageUrl;
+                }
+              }}
+              style={{
+                marginTop: "8px",
+                padding: "4px 8px",
+                fontSize: "12px",
+                backgroundColor: "#ff6b6b",
+                color: "white",
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
+              }}
+            >
+              Debug Image
+            </button>
+          )}
       </div>
     </div>
   );

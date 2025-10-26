@@ -156,12 +156,25 @@
   color: var(--mui-primary);
 }
 
+.logo-link {
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.logo-link:hover {
+  text-decoration: none;
+}
+
 .logo-text {
   font-size: 1.125rem;
   font-weight: 700;
   line-height: 1.25;
   letter-spacing: -0.015em;
   color: var(--mui-text-primary);
+  margin: 0;
 }
 
 .nav-section {

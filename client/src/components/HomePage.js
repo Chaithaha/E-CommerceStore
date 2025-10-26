@@ -8,7 +8,7 @@ import ProductCard from "./ProductCard";
 import AuthDebug from "./AuthDebug";
 import "../NewLandingPage.css";
 
-const HomePage = () => {
+const HomePage = ({ isDarkMode, setIsDarkMode }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, isAuthenticated, logout } = useAuth();
@@ -16,20 +16,6 @@ const HomePage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [isDarkMode, setIsDarkMode] = useState(false);
-
-  useEffect(() => {
-    document.documentElement.classList.toggle("dark", isDarkMode);
-  }, [isDarkMode]);
-
-  // Initialize dark mode state
-  useEffect(() => {
-    setIsDarkMode(
-      localStorage.getItem("darkMode") === "true" ||
-        (!localStorage.getItem("darkMode") &&
-          window.matchMedia("(prefers-color-scheme: dark)").matches),
-    );
-  }, []);
 
   // Fetch products when component mounts, when page gains focus, or when location changes
   useEffect(() => {
@@ -154,7 +140,10 @@ const HomePage = () => {
     <div className="landing-page">
       <div className="layout-container">
         {/* Debug Component */}
-        {user && (user.email === "admin@example.com" || user.role === "admin") && <AuthDebug />}
+        {user &&
+          (user.email === "admin@example.com" || user.role === "admin") && (
+            <AuthDebug />
+          )}
 
         {/* Header Component */}
         <Header

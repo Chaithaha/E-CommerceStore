@@ -22,8 +22,7 @@ const supabaseClient = createClient(supabaseUrl, supabaseKey, {
     persistSession: true,
     autoRefreshToken: true,
     detectSessionInUrl: true,
-    storage: window.localStorage, // Explicitly set storage
-    storageKey: "supabase.auth.token", // Custom storage key
+    storage: window.localStorage, // Let Supabase handle storage
   },
   realtime: {
     params: {
@@ -70,3 +69,4 @@ export const handleSupabaseError = (error) => {
 
 // Export default instance for backward compatibility
 export default supabaseClient;
+export { supabaseClient as supabase };

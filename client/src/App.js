@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -13,6 +13,7 @@ import ErrorBoundary from "./components/common/ErrorBoundary";
 import HomePage from "./components/HomePage";
 // Removed unused ProductCard import
 import ChatPage from "./components/ChatPage";
+import Header from "./components/Header";
 
 import ProductDetailsPage from "./components/ProductDetailsPage";
 
@@ -83,7 +84,29 @@ if (process.env.NODE_ENV === "development") {
 }
 
 function AppContent() {
-  const { loading } = useAuth();
+  const { loading, user, isAuthenticated, logout } = useAuth();
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", isDarkMode);
+  }, [isDarkMode]);
+
+  // Initialize dark mode state
+  useEffect(() => {
+    setIsDarkMode(
+      localStorage.getItem("darkMode") === "true" ||
+        (!localStorage.getItem("darkMode") &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches),
+    );
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
 
   // Show loading spinner while checking auth state
   if (loading) {
@@ -97,7 +120,15 @@ function AppContent() {
           <Routes>
             <Route path="/" element={<Navigate to="/home" replace />} />
 
-            <Route path="/home" element={<HomePage />} />
+            <Route
+              path="/home"
+              element={
+                <HomePage
+                  isDarkMode={isDarkMode}
+                  setIsDarkMode={setIsDarkMode}
+                />
+              }
+            />
 
             <Route path="/login" element={<Auth />} />
             <Route path="/signup" element={<Auth />} />
@@ -106,9 +137,21 @@ function AppContent() {
               path="/create-post"
               element={
                 <ProtectedRoute>
-                  <main className="main-content">
-                    <CreatePost />
-                  </main>
+                  <div className="landing-page">
+                    <div className="layout-container">
+                      <Header
+                        isDarkMode={isDarkMode}
+                        setIsDarkMode={setIsDarkMode}
+                        isAuthenticated={isAuthenticated}
+                        user={user}
+                        username={user?.email || ""}
+                        onLogout={handleLogout}
+                      />
+                      <main className="main-content">
+                        <CreatePost />
+                      </main>
+                    </div>
+                  </div>
                 </ProtectedRoute>
               }
             />

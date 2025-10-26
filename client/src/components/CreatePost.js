@@ -10,9 +10,13 @@ const CreatePost = () => {
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
 
+  // Debug: Log user authentication state
+  console.log("CreatePost - Auth state:", { isAuthenticated, user });
+
   // Redirect if not authenticated
   React.useEffect(() => {
     if (!isAuthenticated) {
+      console.log("User not authenticated, redirecting to home");
       navigate("/home");
     }
   }, [isAuthenticated, navigate]);
@@ -129,11 +133,15 @@ const CreatePost = () => {
         postData.battery_health = parseInt(formData.battery_health);
       }
 
+      console.log("Sending post data to server:", postData);
       const response = await apiClient.post("/api/items", postData);
+      console.log("Server response:", response);
 
       if (response.success) {
+        console.log("Post created successfully, navigating to home");
         navigate("/home");
       } else {
+        console.error("Post creation failed:", response.error);
         setError(response.error || "Failed to create post");
       }
     } catch (err) {
