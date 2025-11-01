@@ -329,10 +329,35 @@ const updatePostStatus = async (req, res) => {
 const deletePost = async (req, res) => {
     try {
         const { id } = req.params;
+        const userId = req.user?.id;
         
         console.log(`Deleting post ${id}`);
         
+        if (!userId) {
+            return res.status(401).json({ error: 'Authentication required' });
+        }
+        
         const supabase = getSupabaseServiceClient();
+        
+        // First, check if the post exists and belongs to the user
+        const { data: existingPost, error: postError } = await supabase
+            .from('posts')
+            .select('user_id')
+            .eq('id', id)
+            .single();
+            
+        if (postError) {
+            console.error('Supabase error fetching post:', postError);
+            if (postError.code === 'PGRST116') {
+                return res.status(404).json({ error: 'Post not found' });
+            }
+            return res.status(400).json({ error: postError.message });
+        }
+        
+        // Check ownership
+        if (existingPost.user_id !== userId) {
+            return res.status(403).json({ error: 'You can only delete your own posts' });
+        }
         
         const { error } = await supabase
             .from('posts')
@@ -356,10 +381,35 @@ const updatePost = async (req, res) => {
     try {
         const { id } = req.params;
         const { title, description, price, category, image_url } = req.body;
+        const userId = req.user?.id;
         
         console.log(`Updating post ${id} with data:`, { title, description, price, category, image_url });
         
+        if (!userId) {
+            return res.status(401).json({ error: 'Authentication required' });
+        }
+        
         const supabase = getSupabaseServiceClient();
+        
+        // First, check if the post exists and belongs to the user
+        const { data: existingPost, error: postError } = await supabase
+            .from('posts')
+            .select('user_id')
+            .eq('id', id)
+            .single();
+            
+        if (postError) {
+            console.error('Supabase error fetching post:', postError);
+            if (postError.code === 'PGRST116') {
+                return res.status(404).json({ error: 'Post not found' });
+            }
+            return res.status(400).json({ error: postError.message });
+        }
+        
+        // Check ownership
+        if (existingPost.user_id !== userId) {
+            return res.status(403).json({ error: 'You can only edit your own posts' });
+        }
         
         // Build update data object
         const updateData = {};

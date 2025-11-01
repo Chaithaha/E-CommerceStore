@@ -103,9 +103,6 @@ const ChatInterface = ({
           <div className="chat-header-title">
             {activeSession.product?.name || "Chat"}
           </div>
-          <div className="chat-header-subtitle">
-            with {activeSession.seller?.username || "Seller"}
-          </div>
         </div>
         {/* WebSocket Connection Status */}
         <div

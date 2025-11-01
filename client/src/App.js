@@ -20,6 +20,8 @@ import ProductDetailsPage from "./components/ProductDetailsPage";
 import AdminDashboard from "./components/admin/AdminDashboard";
 import Auth from "./components/auth/Auth";
 import CreatePost from "./components/CreatePost";
+import MyPostsPage from "./components/MyPostsPage";
+import EditPost from "./components/EditPost";
 
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import "./App.css";
@@ -157,6 +159,52 @@ function AppContent() {
             />
 
             <Route path="/product/:id" element={<ProductDetailsPage />} />
+
+            <Route
+              path="/my-posts"
+              element={
+                <ProtectedRoute>
+                  <div className="landing-page">
+                    <div className="layout-container">
+                      <Header
+                        isDarkMode={isDarkMode}
+                        setIsDarkMode={setIsDarkMode}
+                        isAuthenticated={isAuthenticated}
+                        user={user}
+                        username={user?.email || ""}
+                        onLogout={handleLogout}
+                      />
+                      <main className="main-content">
+                        <MyPostsPage />
+                      </main>
+                    </div>
+                  </div>
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/edit-post/:id"
+              element={
+                <ProtectedRoute>
+                  <div className="landing-page">
+                    <div className="layout-container">
+                      <Header
+                        isDarkMode={isDarkMode}
+                        setIsDarkMode={setIsDarkMode}
+                        isAuthenticated={isAuthenticated}
+                        user={user}
+                        username={user?.email || ""}
+                        onLogout={handleLogout}
+                      />
+                      <main className="main-content">
+                        <EditPost />
+                      </main>
+                    </div>
+                  </div>
+                </ProtectedRoute>
+              }
+            />
 
             <Route
               path="/chat"

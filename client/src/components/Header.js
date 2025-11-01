@@ -30,6 +30,10 @@ const Header = ({
     navigate("/create-post");
   };
 
+  const handleMyPosts = () => {
+    navigate("/my-posts");
+  };
+
   const handleNavigateToAdmin = () => {
     navigate("/admin");
   };
@@ -99,6 +103,7 @@ const Header = ({
         </div>
         <div className="nav-section">
           <div className="nav-links">
+            <a href="/home" className="nav-link">Home</a>
             {/* <a href="/categories">Shop by Category</a> */}
             {/* <a href="/how-it-works">How it Works</a> */}
             {/* <a href="/about">About Us</a> */}
@@ -135,6 +140,15 @@ const Header = ({
                         <span>Dashboard</span>
                       </button>
                     )}
+                    <button
+                      className="dropdown-item"
+                      onClick={() => handleDropdownItemClick(handleMyPosts)}
+                    >
+                      <span className="material-symbols-outlined">
+                        folder
+                      </span>
+                      <span>My Posts</span>
+                    </button>
                     <button
                       className="dropdown-item"
                       onClick={() => handleDropdownItemClick(handleCreatePost)}

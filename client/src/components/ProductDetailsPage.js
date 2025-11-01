@@ -42,6 +42,22 @@ const ProductDetailsPage = () => {
     navigate("/home");
   };
 
+  const handleDeletePost = async (postId) => {
+    try {
+      const response = await apiClient.delete(`/api/items/${postId}`);
+      
+      if (response.success) {
+        alert("Post deleted successfully");
+        navigate("/home");
+      } else {
+        alert("Failed to delete post: " + response.error);
+      }
+    } catch (err) {
+      console.error("Error deleting post:", err);
+      alert("Failed to delete post");
+    }
+  };
+
   useEffect(() => {
     const fetchPost = async () => {
       try {
@@ -293,6 +309,31 @@ const ProductDetailsPage = () => {
               <div className="product-description">
                 <h3>Description</h3>
                 <p>{post.description}</p>
+              </div>
+            )}
+
+            {/* Edit/Delete Actions for Post Owner */}
+            {isAuthenticated && user && post.user?.id === user.id && (
+              <div className="post-actions-section">
+                <h3>Post Management</h3>
+                <div className="action-buttons">
+                  <Button
+                    variant="primary"
+                    onClick={() => navigate(`/edit-post/${post.id}`)}
+                  >
+                    Edit Post
+                  </Button>
+                  <Button
+                    variant="danger"
+                    onClick={() => {
+                      if (window.confirm("Are you sure you want to delete this post? This action cannot be undone.")) {
+                        handleDeletePost(post.id);
+                      }
+                    }}
+                  >
+                    Delete Post
+                  </Button>
+                </div>
               </div>
             )}
           </div>

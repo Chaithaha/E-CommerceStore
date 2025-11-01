@@ -296,6 +296,72 @@
   color: #fbbf24;
 }
 
+/* Trust Score Meter Styles */
+.trust-score-section {
+  margin: 0.5rem 0;
+  padding: 0.5rem;
+  background-color: #f9fafb;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.dark .trust-score-section {
+  background-color: #1f2937;
+  border-color: #374151;
+}
+
+.trust-score-label {
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.25rem;
+}
+
+.dark .trust-score-label {
+  color: #9ca3af;
+}
+
+.trust-score-meter {
+  width: 100%;
+  height: 8px;
+  background-color: #e5e7eb;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 0.25rem;
+}
+
+.dark .trust-score-meter {
+  background-color: #374151;
+}
+
+.trust-score-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease, background-color 0.3s ease;
+}
+
+.trust-score-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.625rem;
+}
+
+.trust-score-value {
+  font-weight: 700;
+}
+
+.trust-score-text {
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.dark .trust-score-text {
+  color: #9ca3af;
+}
+
 .product-actions {
   padding: 0.5rem;
 }

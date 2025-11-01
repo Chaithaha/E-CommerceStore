@@ -371,6 +371,39 @@
   color: #f3f4f6;
 }
 
+/* Post Actions Section */
+.post-actions-section {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #f3f4f6;
+}
+
+.dark .post-actions-section {
+  border-top-color: #374151;
+}
+
+.post-actions-section h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 16px;
+}
+
+.dark .post-actions-section h3 {
+  color: #f3f4f6;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.action-buttons .button {
+  flex: 1;
+  min-width: 120px;
+}
+
 /* Product Actions section removed - chat feature disabled */
 
 .product-details-loading,

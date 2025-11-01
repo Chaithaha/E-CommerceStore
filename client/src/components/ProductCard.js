@@ -148,6 +148,43 @@ const ProductCard = ({ product, onViewDetails }) => {
     });
   };
 
+  const calculateTrustScore = () => {
+    // Calculate trust score based on battery health and other factors
+    const batteryHealth = additionalFields.battery_health || product.battery_health || 0;
+    const hasDiagnostics = additionalFields.has_diagnostics || product.has_diagnostics || false;
+    const hasImages = product.images && product.images.length > 0;
+    
+    // Start with battery health score (0-100)
+    let score = batteryHealth;
+    
+    // Add bonus for diagnostics (up to 20 points)
+    if (hasDiagnostics) {
+      score += 20;
+    }
+    
+    // Add bonus for images (up to 10 points)
+    if (hasImages) {
+      score += 10;
+    }
+    
+    // Cap at 100
+    return Math.min(100, score);
+  };
+
+  const getTrustScoreColor = (score) => {
+    if (score >= 80) return "#10b981"; // Green
+    if (score >= 60) return "#f59e0b"; // Yellow
+    if (score >= 40) return "#f97316"; // Orange
+    return "#ef4444"; // Red
+  };
+
+  const getTrustScoreLabel = (score) => {
+    if (score >= 80) return "Excellent";
+    if (score >= 60) return "Good";
+    if (score >= 40) return "Fair";
+    return "Poor";
+  };
+
   return (
     <div className="product-card">
       <div className="product-image-container" data-alt={product.title}>
@@ -186,6 +223,31 @@ const ProductCard = ({ product, onViewDetails }) => {
           <h3 className="product-title">{product.title}</h3>
           <div className="product-category">
             {product.category || "Electronics"}
+          </div>
+        </div>
+
+        {/* Trust Score Meter */}
+        <div className="trust-score-section">
+          <div className="trust-score-label">Trust Score</div>
+          <div className="trust-score-meter">
+            <div
+              className="trust-score-fill"
+              style={{
+                width: `${calculateTrustScore()}%`,
+                backgroundColor: getTrustScoreColor(calculateTrustScore())
+              }}
+            ></div>
+          </div>
+          <div className="trust-score-info">
+            <span
+              className="trust-score-value"
+              style={{ color: getTrustScoreColor(calculateTrustScore()) }}
+            >
+              {calculateTrustScore()}/100
+            </span>
+            <span className="trust-score-text">
+              {getTrustScoreLabel(calculateTrustScore())}
+            </span>
           </div>
         </div>
 
