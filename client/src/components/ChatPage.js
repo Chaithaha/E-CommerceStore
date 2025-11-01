@@ -23,6 +23,9 @@ const ChatPage = ({ initialSession }) => {
   const [isSendingMessage, setIsSendingMessage] = useState(false);
   const [wsConnectionError, setWsConnectionError] = useState(false);
   const [wsConnectionStatus, setWsConnectionStatus] = useState("connecting");
+  
+  // Get location state to check if we're coming from a product card
+  const location = window.location;
 
   // Refs
   const messagesEndRef = useRef(null);
@@ -83,10 +86,17 @@ const ChatPage = ({ initialSession }) => {
       // Set demo user for now (no authentication system yet)
       setUser({ id: "demo-user-id", name: "Demo User" });
 
-      // For now, show empty state since we don't have authentication
-      // TODO: Implement proper authentication system
-      setSessions([]);
-      setActiveSession(null);
+      // Check if we're coming from a product card
+      const state = location.state;
+      if (state && state.productId) {
+        // Create a new demo chat session for this product
+        await handleCreateNewSession(state.productId, state.sellerId, state.productTitle, state.productPrice);
+      } else {
+        // For now, show empty state since we don't have authentication
+        // TODO: Implement proper authentication system
+        setSessions([]);
+        setActiveSession(null);
+      }
 
       console.log("Chat initialized in demo mode (no authentication)");
     } catch (err) {
@@ -263,7 +273,7 @@ const ChatPage = ({ initialSession }) => {
   };
 
   // Create new chat session (demo mode)
-  const handleCreateNewSession = async (productId, sellerId) => {
+  const handleCreateNewSession = async (productId, sellerId, productTitle, productPrice) => {
     if (!user) return;
 
     setIsCreatingSession(true);
@@ -278,9 +288,9 @@ const ChatPage = ({ initialSession }) => {
         updated_at: new Date().toISOString(),
         product: {
           id: productId || "demo-product",
-          name: "Demo Product",
+          name: productTitle || "Demo Product",
           image_url: null,
-          price: 99.99,
+          price: productPrice || 99.99,
         },
         buyer: {
           id: user.id,

@@ -9,8 +9,9 @@
     0 10px 15px -3px rgba(0, 0, 0, 0.1),
     0 4px 6px -2px rgba(0, 0, 0, 0.05);
   transition: all 0.3s ease;
-  width: 280px;
-  max-width: "100%";
+  width: 100%;
+  min-width: 250px;
+  max-width: 320px;
 }
 
 .dark .product-card {
@@ -321,18 +322,21 @@
 /* Responsive Design */
 @media (min-width: 768px) {
   .product-card {
-    width: 280px;
+    min-width: 260px;
+    max-width: 300px;
   }
 }
 
 @media (min-width: 1024px) {
   .product-card {
-    width: 280px;
+    min-width: 270px;
+    max-width: 310px;
   }
 }
 
 @media (min-width: 1280px) {
   .product-card {
-    width: 280px;
+    min-width: 280px;
+    max-width: 320px;
   }
 }

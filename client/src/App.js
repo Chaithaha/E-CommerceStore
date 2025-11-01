@@ -161,11 +161,9 @@ function AppContent() {
             <Route
               path="/chat"
               element={
-                <ProtectedRoute>
-                  <main className="main-content">
-                    <ChatPage initialSession={null} />
-                  </main>
-                </ProtectedRoute>
+                <main className="main-content">
+                  <ChatPage initialSession={null} />
+                </main>
               }
             />
 

@@ -14,7 +14,7 @@ import "../styles/common.css";
 
 const ProductCard = ({ product, onViewDetails }) => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const [imageLoaded, setImageLoaded] = React.useState(false);
   const [imageError, setImageError] = React.useState(false);
   const [imageUrl, setImageUrl] = React.useState(null);
@@ -136,6 +136,18 @@ const ProductCard = ({ product, onViewDetails }) => {
     }
   };
 
+  const handleChatWithSeller = () => {
+    // Navigate to chat page with product information
+    navigate('/chat', {
+      state: {
+        productId: product.id,
+        productTitle: product.title,
+        productPrice: product.price,
+        sellerId: product.seller_id || 'demo-seller'
+      }
+    });
+  };
+
   return (
     <div className="product-card">
       <div className="product-image-container" data-alt={product.title}>
@@ -215,6 +227,18 @@ const ProductCard = ({ product, onViewDetails }) => {
         >
           View Details
         </Button>
+        
+        {isAuthenticated && (
+          <Button
+            variant="secondary"
+            size="large"
+            fullWidth
+            onClick={handleChatWithSeller}
+            style={{ marginTop: '8px' }}
+          >
+            Chat with Seller
+          </Button>
+        )}
 
         {/* Debug button - only visible in development */}
         {process.env.NODE_ENV === "development" &&
