@@ -102,6 +102,7 @@ const Header = ({
             {/* <a href="/categories">Shop by Category</a> */}
             {/* <a href="/how-it-works">How it Works</a> */}
             {/* <a href="/about">About Us</a> */}
+            <a href="/chat" className="nav-link">Chat</a>
           </div>
         </div>
         <div className="action-buttons">

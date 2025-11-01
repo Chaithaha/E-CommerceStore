@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import LoadingSpinner from "./common/LoadingSpinner";
 import { chatService } from "../services/chatService";
+import ChatSessionsSidebar from "./chat/ChatSessionsSidebar";
+import ChatInterface from "./chat/ChatInterface";
 import "./ChatPage.css";
 
 /**
@@ -23,15 +25,19 @@ const ChatPage = ({ initialSession }) => {
   const [isSendingMessage, setIsSendingMessage] = useState(false);
   const [wsConnectionError, setWsConnectionError] = useState(false);
   const [wsConnectionStatus, setWsConnectionStatus] = useState("connecting");
-  
+
   // Get location state to check if we're coming from a product card
   const location = window.location;
 
   // Refs
   const messagesEndRef = useRef(null);
-  const inputRef = useRef(null);
   // typingTimeoutRef not used in demo mode
   const wsRetryTimeoutRef = useRef(null);
+
+  // Debug activeSession changes
+  useEffect(() => {
+    console.log("activeSession changed:", activeSession);
+  }, [activeSession]);
 
   // Handle new message from subscription
   const handleNewMessage = useCallback(
@@ -55,7 +61,9 @@ const ChatPage = ({ initialSession }) => {
         }
 
         // Scroll to bottom
-        setTimeout(() => scrollToBottom(), 100);
+        setTimeout(() => {
+          messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+        }, 100);
       }
     },
     [activeSession, sessions],
@@ -90,7 +98,12 @@ const ChatPage = ({ initialSession }) => {
       const state = location.state;
       if (state && state.productId) {
         // Create a new demo chat session for this product
-        await handleCreateNewSession(state.productId, state.sellerId, state.productTitle, state.productPrice);
+        await handleCreateNewSession(
+          state.productId,
+          state.sellerId,
+          state.productTitle,
+          state.productPrice,
+        );
       } else {
         // For now, show empty state since we don't have authentication
         // TODO: Implement proper authentication system
@@ -111,6 +124,7 @@ const ChatPage = ({ initialSession }) => {
   const handleSessionSelect = async (session) => {
     try {
       setActiveSession(session);
+      console.log("Setting activeSession to:", session);
       setMessages([]);
 
       // For demo mode, show empty messages
@@ -118,7 +132,9 @@ const ChatPage = ({ initialSession }) => {
       setMessages([]);
 
       // Scroll to bottom
-      setTimeout(() => scrollToBottom(), 100);
+      setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+      }, 100);
 
       console.log("Demo session selected:", session);
     } catch (err) {
@@ -245,9 +261,33 @@ const ChatPage = ({ initialSession }) => {
 
       // Add message to local state immediately for better UX
       setMessages((prev) => [...prev, mockMessage]);
-      scrollToBottom();
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
 
       console.log("Demo message sent:", messageContent);
+
+      // Check if message is "hello" (case-insensitive) and send auto-response
+      const lowerCaseMessage = messageContent.toLowerCase();
+      if (lowerCaseMessage === "hello") {
+        setTimeout(() => {
+          const sellerResponse = {
+            id: Date.now().toString(),
+            content: "Hello, are you interested in buying this?",
+            sender_id: "demo-seller",
+            created_at: new Date().toISOString(),
+            sender: {
+              id: "demo-seller",
+              username: "Demo Seller",
+              full_name: "Demo Seller",
+              avatar_url: null,
+            },
+          };
+          
+          setMessages((prev) => [...prev, sellerResponse]);
+          messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+          
+          console.log("Auto-response sent: Hello, are you interested in buying this?");
+        }, 2000); // 2 second delay
+      }
     } catch (err) {
       console.error("Error sending message:", err);
       setError("Failed to send message. Please try again.");
@@ -273,7 +313,12 @@ const ChatPage = ({ initialSession }) => {
   };
 
   // Create new chat session (demo mode)
-  const handleCreateNewSession = async (productId, sellerId, productTitle, productPrice) => {
+  const handleCreateNewSession = async (
+    productId,
+    sellerId,
+    productTitle,
+    productPrice,
+  ) => {
     if (!user) return;
 
     setIsCreatingSession(true);
@@ -307,15 +352,72 @@ const ChatPage = ({ initialSession }) => {
       };
 
       setSessions((prev) => [mockSession, ...prev]);
+      console.log("Calling handleSessionSelect with:", mockSession);
       handleSessionSelect(mockSession);
 
       console.log("Demo session created:", mockSession);
+      console.log("Current activeSession state:", activeSession);
     } catch (err) {
       console.error("Error creating session:", err);
       setError("Failed to create new chat session.");
     } finally {
       setIsCreatingSession(false);
     }
+  };
+
+  // Create new chat session without parameters (for demo button)
+  const handleCreateNewSessionNoParams = async () => {
+    if (!user) return;
+
+    setIsCreatingSession(true);
+    try {
+      // Create a mock session for demo
+      const mockSession = {
+        id: Date.now().toString(),
+        product_id: "demo-product",
+        buyer_id: user.id,
+        seller_id: "demo-seller",
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        product: {
+          id: "demo-product",
+          name: "Demo Product",
+          image_url: null,
+          price: 99.99,
+        },
+        buyer: {
+          id: user.id,
+          username: user.name,
+          full_name: user.name,
+          avatar_url: null,
+        },
+        seller: {
+          id: "demo-seller",
+          username: "Demo Seller",
+          full_name: "Demo Seller",
+          avatar_url: null,
+        },
+      };
+
+      setSessions((prev) => [mockSession, ...prev]);
+      console.log("Calling handleSessionSelect with:", mockSession);
+      handleSessionSelect(mockSession);
+
+      console.log("Demo session created:", mockSession);
+      console.log("Current activeSession state:", activeSession);
+    } catch (err) {
+      console.error("Error creating session:", err);
+      setError("Failed to create new chat session.");
+    } finally {
+      setIsCreatingSession(false);
+    }
+  };
+
+
+  // Create a demo chat session with default values
+  const createDemoChat = () => {
+    console.log("createDemoChat called");
+    handleCreateNewSessionNoParams();
   };
 
   // Filter sessions based on search
@@ -329,49 +431,6 @@ const ChatPage = ({ initialSession }) => {
         ?.toLowerCase()
         .includes(searchTerm.toLowerCase()),
   );
-
-  // Scroll to bottom of messages
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  // Auto-scroll when messages change
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
-  // Focus input when active session changes
-  useEffect(() => {
-    if (activeSession && inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, [activeSession]);
-
-  // Render message bubble
-  const renderMessage = (message) => {
-    const isSent = message.sender_id === user?.id;
-    const time = new Date(message.created_at).toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-
-    return (
-      <div
-        key={message.id}
-        className={`chat-message ${isSent ? "sent" : "received"}`}
-      >
-        <div className="chat-message-avatar">
-          {isSent
-            ? "You"
-            : message.sender?.username?.charAt(0).toUpperCase() || "U"}
-        </div>
-        <div className="chat-message-content">
-          <div className="chat-message-bubble">{message.content}</div>
-          <div className="chat-message-time">{time}</div>
-        </div>
-      </div>
-    );
-  };
 
   // Main render
   if (loading) {
@@ -401,167 +460,35 @@ const ChatPage = ({ initialSession }) => {
   }
 
   return (
-    <div className="chat-page">
-      {/* Chat Sessions Sidebar */}
-      <div className="chat-sessions-sidebar">
-        <div className="chat-sessions-header">
-          <h2>Chats</h2>
-        </div>
-
-        <div className="chat-sessions-search">
-          <input
-            type="text"
-            placeholder="Search chats..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+    <div className="chat-page-with-header">
+      <div className="chat-page">
+        {/* Chat Sessions Sidebar - aligned with navbar */}
+        <div className="chat-sessions-sidebar">
+          <ChatSessionsSidebar
+            sessions={filteredSessions}
+            activeSession={activeSession}
+            onSessionSelect={handleSessionSelect}
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            onCreateNewSession={createDemoChat}
+            isCreatingSession={isCreatingSession}
           />
-          <div className="chat-sessions-search-icon">🔍</div>
         </div>
 
-        <div className="chat-sessions-list">
-          {filteredSessions.length === 0 ? (
-            <div className="chat-empty-state">
-              <div className="chat-empty-state-icon">💬</div>
-              <h3>Demo Mode</h3>
-              <p>
-                Chat functionality is in demo mode. Authentication system not
-                yet implemented.
-              </p>
-              <button
-                className="chat-demo-button"
-                onClick={() => handleCreateNewSession()}
-                disabled={isCreatingSession}
-              >
-                {isCreatingSession ? "Creating..." : "Create Demo Chat"}
-              </button>
-            </div>
-          ) : (
-            filteredSessions.map((session) => (
-              <div
-                key={session.id}
-                className={`chat-session-item ${activeSession?.id === session.id ? "active" : ""}`}
-                onClick={() => handleSessionSelect(session)}
-              >
-                <div className="chat-session-avatar">
-                  {session.product?.name?.charAt(0).toUpperCase() || "C"}
-                </div>
-                <div className="chat-session-info">
-                  <div className="chat-session-title">
-                    {session.product?.name || "Chat"}
-                  </div>
-                  <div className="chat-session-preview">
-                    {session.messages?.[0]?.content || "No messages yet"}
-                  </div>
-                </div>
-                <div className="chat-session-meta">
-                  <div className="chat-session-time">
-                    {new Date(session.updated_at).toLocaleDateString()}
-                  </div>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-      </div>
-
-      {/* Chat Interface */}
-      <div className="chat-interface">
-        {activeSession ? (
-          <>
-            {/* Chat Header */}
-            <div className="chat-header">
-              <div className="chat-header-info">
-                <div className="chat-header-avatar">
-                  {activeSession.product?.name?.charAt(0).toUpperCase() || "C"}
-                </div>
-                <div className="chat-header-title">
-                  {activeSession.product?.name || "Chat"}
-                </div>
-                <div className="chat-header-subtitle">
-                  with {activeSession.seller?.username || "Seller"}
-                </div>
-              </div>
-              {/* WebSocket Connection Status */}
-              <div
-                className={`ws-connection-status ${wsConnectionError ? "error" : wsConnectionStatus === "OPEN" ? "connected" : "connecting"}`}
-                onClick={
-                  wsConnectionError ? retryWebSocketConnection : undefined
-                }
-                style={{ cursor: wsConnectionError ? "pointer" : "default" }}
-              >
-                <div className="ws-status-indicator"></div>
-                <span className="ws-status-text">
-                  {wsConnectionError
-                    ? "Connection Error - Click to Retry"
-                    : wsConnectionStatus === "OPEN"
-                      ? "Connected"
-                      : wsConnectionStatus === "connecting"
-                        ? "Connecting..."
-                        : wsConnectionStatus}
-                </span>
-              </div>
-            </div>
-
-            {/* Messages Container */}
-            <div className="chat-messages-container">
-              <div className="chat-messages">
-                {messages.length === 0 ? (
-                  <div className="chat-empty-state">
-                    <div className="chat-empty-state-icon">💬</div>
-                    <h3>No Messages Yet</h3>
-                    <p>Start the conversation by sending a message</p>
-                  </div>
-                ) : (
-                  messages.map(renderMessage)
-                )}
-                <div ref={messagesEndRef} />
-              </div>
-            </div>
-
-            {/* Message Input */}
-            <div className="chat-input-container">
-              <div className="chat-input-wrapper">
-                <textarea
-                  ref={inputRef}
-                  className="chat-input"
-                  placeholder="Type a message..."
-                  value={newMessage}
-                  onChange={handleInputChange}
-                  onKeyPress={handleKeyPress}
-                  rows={1}
-                />
-                <button
-                  className="chat-input-button"
-                  onClick={handleSendMessage}
-                  disabled={!newMessage.trim() || isSendingMessage}
-                >
-                  {isSendingMessage ? (
-                    <div className="chat-sending-spinner">
-                      <div className="spinner"></div>
-                    </div>
-                  ) : (
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                    >
-                      <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
-                    </svg>
-                  )}
-                </button>
-              </div>
-            </div>
-          </>
-        ) : (
-          <div className="chat-empty-state">
-            <div className="chat-empty-state-icon">💬</div>
-            <h3>Demo Chat Mode</h3>
-            <p>
-              Chat functionality is in demo mode. No real sessions available
-              yet.
-            </p>
-          </div>
-        )}
+        {/* Chat Interface - fills remaining space */}
+        <ChatInterface
+          activeSession={activeSession}
+          messages={messages}
+          newMessage={newMessage}
+          onMessageChange={handleInputChange}
+          onKeyPress={handleKeyPress}
+          onSendMessage={handleSendMessage}
+          isSendingMessage={isSendingMessage}
+          wsConnectionStatus={wsConnectionStatus}
+          wsConnectionError={wsConnectionError}
+          onRetryConnection={retryWebSocketConnection}
+          user={user}
+        />
       </div>
     </div>
   );

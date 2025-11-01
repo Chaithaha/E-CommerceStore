@@ -161,9 +161,21 @@ function AppContent() {
             <Route
               path="/chat"
               element={
-                <main className="main-content">
-                  <ChatPage initialSession={null} />
-                </main>
+                <div className="landing-page">
+                  <div className="layout-container">
+                    <Header
+                      isDarkMode={isDarkMode}
+                      setIsDarkMode={setIsDarkMode}
+                      isAuthenticated={isAuthenticated}
+                      user={user}
+                      username={user?.email || ""}
+                      onLogout={handleLogout}
+                    />
+                    <main className="main-content chat-page-content">
+                      <ChatPage initialSession={null} />
+                    </main>
+                  </div>
+                </div>
               }
             />
 

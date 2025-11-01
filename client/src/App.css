@@ -10,6 +10,11 @@
   padding-top: 80px;
 }
 
+/* Special case for chat page - no top padding */
+.main-content.chat-page-content {
+  padding-top: 0;
+}
+
 .App-header {
   background-color: white;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
