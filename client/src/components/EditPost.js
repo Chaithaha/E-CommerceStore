@@ -324,12 +324,11 @@ const EditPost = () => {
               required
             >
               <option value="">Select a category</option>
-              <option value="electronics">Electronics</option>
-              <option value="clothing">Clothing</option>
-              <option value="home">Home & Garden</option>
-              <option value="sports">Sports & Outdoors</option>
-              <option value="books">Books & Media</option>
-              <option value="other">Other</option>
+              <option value="phones">Phones & Tablets</option>
+              <option value="home-appliances">Home Appliances</option>
+              <option value="computers">Computers & Laptops</option>
+              <option value="audio">Audio & Headphones</option>
+              <option value="other">Other Electronics</option>
             </select>
           </div>
 

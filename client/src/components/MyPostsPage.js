@@ -117,35 +117,15 @@ const MyPostsPage = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="my-posts-page">
-        <Header
-          isDarkMode={isDarkMode}
-          setIsDarkMode={setIsDarkMode}
-          isAuthenticated={isAuthenticated}
-          user={user}
-          username={user?.name || "User"}
-        />
-        <div className="my-posts-content loading">
-          <div className="loading-spinner"></div>
-          <p>Loading your posts...</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="my-posts-page">
-      <Header
-        isDarkMode={isDarkMode}
-        setIsDarkMode={setIsDarkMode}
-        isAuthenticated={isAuthenticated}
-        user={user}
-        username={user?.name || "User"}
-      />
-
       <div className="my-posts-content">
+        {loading && (
+          <div className="my-posts-content loading">
+            <div className="loading-spinner"></div>
+            <p>Loading your posts...</p>
+          </div>
+        )}
         <div className="my-posts-header">
           <h1>My Posts</h1>
           <p>Manage your posted items</p>
@@ -159,10 +139,6 @@ const MyPostsPage = () => {
         {posts.length === 0 ? (
           <div className="no-posts">
             <h2>No posts yet</h2>
-            <p>You haven't created any posts yet.</p>
-            <Button onClick={handleCreateNewPost} variant="primary">
-              Create Your First Post
-            </Button>
           </div>
         ) : (
           <div className="posts-grid">
@@ -183,7 +159,7 @@ const MyPostsPage = () => {
                       <span>No image</span>
                     </div>
                   )}
-                  <div 
+                  <div
                     className="post-status"
                     style={{ backgroundColor: getStatusColor(post.status) }}
                   >

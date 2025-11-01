@@ -7,7 +7,7 @@ const createItem = async (req, res) => {
         console.log('Attempting to create new item with images...');
 
         // Extract item data and images from request body
-        const { title, description, price, category, images } = req.body;
+        const { title, description, price, category, images, battery_health, market_value } = req.body;
 
         // Validate required fields
         if (!title || !price || !category) {
@@ -54,6 +54,8 @@ const createItem = async (req, res) => {
                 category,
                 user_id: userId,
                 status: itemStatus,
+                battery_health: battery_health ? parseInt(battery_health) : null,
+                market_value: market_value ? parseFloat(market_value) : null,
                 created_at: new Date().toISOString()
             })
             .select()
@@ -189,6 +191,8 @@ const createItem = async (req, res) => {
             price: newItem.price,
             category: newItem.category,
             status: newItem.status,
+            battery_health: newItem.battery_health,
+            market_value: newItem.market_value,
             image_url: newItem.image_url,
             images: uploadedImages,
             user: {
@@ -424,9 +428,9 @@ const deleteItem = async (req, res) => {
 const updateItem = async (req, res) => {
     try {
         const { id } = req.params;
-        const { title, description, price, category, image_url } = req.body;
+        const { title, description, price, category, image_url, battery_health, market_value } = req.body;
         
-        console.log(`Updating item ${id} with data:`, { title, description, price, category, image_url });
+        console.log(`Updating item ${id} with data:`, { title, description, price, category, image_url, battery_health, market_value });
         
         const supabase = getSupabaseServiceClient();
         
@@ -437,6 +441,8 @@ const updateItem = async (req, res) => {
         if (price !== undefined) updateData.price = parseFloat(price);
         if (category !== undefined) updateData.category = category;
         if (image_url !== undefined) updateData.image_url = image_url;
+        if (battery_health !== undefined) updateData.battery_health = battery_health ? parseInt(battery_health) : null;
+        if (market_value !== undefined) updateData.market_value = market_value ? parseFloat(market_value) : null;
         updateData.updated_at = new Date().toISOString();
         
         const { data, error } = await supabase

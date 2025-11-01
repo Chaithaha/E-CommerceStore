@@ -1,17 +1,21 @@
-/* My Posts Page Styles */
+/* My Posts Page Styles - CreatePost Inspired */
 .my-posts-page {
   min-height: 100vh;
-  background-color: #f9fafb;
+  background-color: #ffffff;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu,
+    Cantarell, sans-serif;
 }
 
 .dark .my-posts-page {
-  background-color: #111827;
+  background-color: #ffffff;
 }
 
 .my-posts-content {
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem;
+  min-height: calc(100vh - 200px);
 }
 
 .my-posts-header {
@@ -46,43 +50,31 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 50vh;
+  min-height: 60vh;
   text-align: center;
 }
 
-/* No Posts State */
+/* No Posts State - Simple Text */
 .no-posts {
   text-align: center;
-  padding: 4rem 2rem;
-  background-color: white;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 2rem 0;
+  color: #6b7280;
+  font-size: 1.125rem;
 }
 
 .dark .no-posts {
-  background-color: #1f2937;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  color: #9ca3af;
 }
 
 .no-posts h2 {
   color: #111827;
-  font-size: 1.875rem;
+  font-size: 1.5rem;
   font-weight: 600;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
 }
 
 .dark .no-posts h2 {
   color: #ffffff;
-}
-
-.no-posts p {
-  color: #6b7280;
-  font-size: 1.125rem;
-  margin-bottom: 2rem;
-}
-
-.dark .no-posts p {
-  color: #9ca3af;
 }
 
 /* Posts Grid */
@@ -92,26 +84,29 @@
   gap: 2rem;
 }
 
-/* Post Card */
+/* Post Card - CreatePost Inspired */
 .post-card {
   background-color: white;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
   overflow: hidden;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: all 0.3s ease;
+  border: 1px solid var(--border-gray-200);
 }
 
 .dark .post-card {
   background-color: #1f2937;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+  border-color: var(--border-dark);
 }
 
 .post-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--primary);
 }
 
-/* Post Image */
+/* Post Image - CreatePost Inspired */
 .post-image-container {
   position: relative;
   width: 100%;
@@ -128,6 +123,11 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.post-card:hover .post-image {
+  transform: scale(1.05);
 }
 
 .post-image-placeholder {
@@ -142,18 +142,21 @@
 
 .post-status {
   position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-  padding: 0.25rem 0.75rem;
+  top: 0.75rem;
+  right: 0.75rem;
+  padding: 0.375rem 0.875rem;
   border-radius: 9999px;
-  font-size: 0.75rem;
+  font-size: 0.625rem;
   font-weight: 600;
   color: white;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(4px);
+  background-color: rgba(0, 0, 0, 0.7);
 }
 
-/* Post Content */
+/* Post Content - CreatePost Inspired */
 .post-content {
   padding: 1.5rem;
 }
@@ -190,6 +193,7 @@
   flex-wrap: wrap;
   gap: 0.5rem;
   margin-bottom: 1rem;
+  align-items: center;
 }
 
 .post-price {
@@ -204,12 +208,13 @@
 
 .post-category {
   color: #6b7280;
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   background-color: #f3f4f6;
-  padding: 0.125rem 0.5rem;
-  border-radius: 4px;
+  padding: 0.25rem 0.625rem;
+  border-radius: var(--radius);
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  font-weight: 500;
 }
 
 .dark .post-category {
@@ -220,9 +225,10 @@
 .post-date {
   color: #9ca3af;
   font-size: 0.75rem;
+  margin-left: auto;
 }
 
-/* Post Actions */
+/* Post Actions - CreatePost Inspired */
 .post-actions {
   display: flex;
   gap: 0.5rem;
@@ -232,10 +238,33 @@
 .post-actions .button {
   flex: 1;
   font-size: 0.875rem;
-  padding: 0.5rem;
+  padding: 0.625rem 1rem;
+  border-radius: var(--radius);
+  font-weight: 500;
+  transition: all 0.2s ease;
 }
 
-/* Responsive Design */
+.post-actions .button:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.post-actions .button:active {
+  transform: translateY(0);
+}
+
+/* Responsive Design - CreatePost Inspired */
+@media (max-width: 992px) {
+  .my-posts-content {
+    padding: 1.5rem;
+  }
+
+  .posts-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+}
+
 @media (max-width: 768px) {
   .my-posts-content {
     padding: 1rem;
@@ -257,6 +286,10 @@
   .post-actions {
     flex-direction: column;
   }
+
+  .post-actions .button {
+    width: 100%;
+  }
 }
 
 @media (max-width: 480px) {
@@ -274,5 +307,10 @@
 
   .post-actions {
     padding: 0 1rem 1rem;
+  }
+
+  .post-actions .button {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
   }
 }

@@ -205,164 +205,178 @@ const CreatePost = () => {
         {error && <ErrorMessage message={error} />}
 
         <form onSubmit={handleSubmit} className="post-form">
-          <div className="form-group">
-            <label htmlFor="title">Title</label>
-            <input
-              type="text"
-              id="title"
-              name="title"
-              value={formData.title}
-              onChange={handleInputChange}
-              required
-              placeholder="Enter post title"
-            />
+          {/* Images Section - Moved to Top */}
+          <div className="form-section images-section">
+            <h3 className="form-section-title">Images</h3>
+            
+            <div className="form-group">
+              <label htmlFor="images">Images (Optional - Max 5)</label>
+              <div className="file-upload-container">
+                <input
+                  type="file"
+                  id="images"
+                  name="images"
+                  accept="image/jpeg,image/jpg,image/png,image/webp,image/gif"
+                  multiple
+                  onChange={handleFileSelect}
+                  disabled={selectedFiles.length >= 5}
+                  className="file-input"
+                />
+                <label htmlFor="images" className="file-upload-button">
+                  Choose Images
+                </label>
+                <span className="file-count">
+                  {selectedFiles.length}/5 images selected
+                </span>
+              </div>
+
+              {previewUrls.length > 0 && (
+                <div className="image-preview-container">
+                  {previewUrls.map((url, index) => (
+                    <div key={index} className="image-preview-item">
+                      <img
+                        src={url}
+                        alt={`Preview ${index + 1}`}
+                        className="image-preview"
+                      />
+                      <button
+                        type="button"
+                        className="remove-image-button"
+                        onClick={() => removeFile(index)}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
-          <div className="form-group">
-            <label htmlFor="description">Description</label>
-            <textarea
-              id="description"
-              name="description"
-              value={formData.description}
-              onChange={handleInputChange}
-              required
-              placeholder="Describe your item"
-              rows="4"
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="price">Price ($)</label>
-            <input
-              type="number"
-              id="price"
-              name="price"
-              value={formData.price}
-              onChange={handleInputChange}
-              required
-              placeholder="0.00"
-              min="0"
-              step="0.01"
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="category">Category</label>
-            <select
-              id="category"
-              name="category"
-              value={formData.category}
-              onChange={handleInputChange}
-              required
-            >
-              <option value="">Select a category</option>
-              <option value="electronics">Electronics</option>
-              <option value="clothing">Clothing</option>
-              <option value="home">Home & Garden</option>
-              <option value="sports">Sports & Outdoors</option>
-              <option value="books">Books & Media</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="condition">Condition</label>
-            <select
-              id="condition"
-              name="condition"
-              value={formData.condition}
-              onChange={handleInputChange}
-              required
-            >
-              <option value="new">New</option>
-              <option value="like-new">Like New</option>
-              <option value="good">Good</option>
-              <option value="fair">Fair</option>
-              <option value="poor">Poor</option>
-            </select>
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="battery_health">Battery Health (%)</label>
-            <input
-              type="number"
-              id="battery_health"
-              name="battery_health"
-              value={formData.battery_health}
-              onChange={handleInputChange}
-              placeholder="Enter battery health percentage"
-              min="0"
-              max="100"
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="date_bought">Date Bought</label>
-            <input
-              type="date"
-              id="date_bought"
-              name="date_bought"
-              value={formData.date_bought}
-              onChange={handleInputChange}
-              max={new Date().toISOString().split("T")[0]}
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="market_value">Market Value ($)</label>
-            <input
-              type="number"
-              id="market_value"
-              name="market_value"
-              value={formData.market_value}
-              onChange={handleInputChange}
-              placeholder="Enter estimated market value"
-              min="0"
-              step="0.01"
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="images">Images (Optional - Max 5)</label>
-            <div className="file-upload-container">
+          {/* Basic Information Section */}
+          <div className="form-section basic-info-section">
+            <h3 className="form-section-title">Basic Information</h3>
+            
+            <div className="form-group">
+              <label htmlFor="title">Title</label>
               <input
-                type="file"
-                id="images"
-                name="images"
-                accept="image/jpeg,image/jpg,image/png,image/webp,image/gif"
-                multiple
-                onChange={handleFileSelect}
-                disabled={selectedFiles.length >= 5}
-                className="file-input"
+                type="text"
+                id="title"
+                name="title"
+                value={formData.title}
+                onChange={handleInputChange}
+                required
+                placeholder="Enter post title"
               />
-              <label htmlFor="images" className="file-upload-button">
-                Choose Images
-              </label>
-              <span className="file-count">
-                {selectedFiles.length}/5 images selected
-              </span>
             </div>
 
-            {previewUrls.length > 0 && (
-              <div className="image-preview-container">
-                {previewUrls.map((url, index) => (
-                  <div key={index} className="image-preview-item">
-                    <img
-                      src={url}
-                      alt={`Preview ${index + 1}`}
-                      className="image-preview"
-                    />
-                    <button
-                      type="button"
-                      className="remove-image-button"
-                      onClick={() => removeFile(index)}
-                    >
-                      ×
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
+            <div className="form-group">
+              <label htmlFor="description">Description</label>
+              <textarea
+                id="description"
+                name="description"
+                value={formData.description}
+                onChange={handleInputChange}
+                required
+                placeholder="Describe your item"
+                rows="4"
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="price">Price ($)</label>
+              <input
+                type="number"
+                id="price"
+                name="price"
+                value={formData.price}
+                onChange={handleInputChange}
+                required
+                placeholder="0.00"
+                min="0"
+                step="0.01"
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="category">Category</label>
+              <select
+                id="category"
+                name="category"
+                value={formData.category}
+                onChange={handleInputChange}
+                required
+              >
+                <option value="">Select a category</option>
+                <option value="phones">Phones & Tablets</option>
+                <option value="home-appliances">Home Appliances</option>
+                <option value="computers">Computers & Laptops</option>
+                <option value="audio">Audio & Headphones</option>
+                <option value="other">Other Electronics</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Product Details Section */}
+          <div className="form-section product-details-section">
+            <h3 className="form-section-title">Product Details</h3>
+            
+            <div className="form-group">
+              <label htmlFor="condition">Condition</label>
+              <select
+                id="condition"
+                name="condition"
+                value={formData.condition}
+                onChange={handleInputChange}
+                required
+              >
+                <option value="new">New</option>
+                <option value="like-new">Like New</option>
+                <option value="good">Good</option>
+                <option value="fair">Fair</option>
+                <option value="poor">Poor</option>
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="battery_health">Battery Health (%)</label>
+              <input
+                type="number"
+                id="battery_health"
+                name="battery_health"
+                value={formData.battery_health}
+                onChange={handleInputChange}
+                placeholder="Enter battery health percentage"
+                min="0"
+                max="100"
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="date_bought">Date Bought</label>
+              <input
+                type="date"
+                id="date_bought"
+                name="date_bought"
+                value={formData.date_bought}
+                onChange={handleInputChange}
+                max={new Date().toISOString().split("T")[0]}
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="market_value">Market Value ($)</label>
+              <input
+                type="number"
+                id="market_value"
+                name="market_value"
+                value={formData.market_value}
+                onChange={handleInputChange}
+                placeholder="Enter estimated market value"
+                min="0"
+                step="0.01"
+              />
+            </div>
           </div>
 
           <div className="form-actions">

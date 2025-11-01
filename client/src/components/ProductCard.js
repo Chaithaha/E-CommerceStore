@@ -268,13 +268,13 @@ const ProductCard = ({ product, onViewDetails }) => {
             <span
               className={`detail-value ${getBatteryHealthColor(additionalFields.battery_health || 0)}`}
             >
-              {additionalFields.battery_health || 0}%
+              {additionalFields.battery_health ? `${additionalFields.battery_health}%` : "N/A"}
             </span>
           </div>
           <div className="product-detail-item">
             <span className="detail-label">Market Value:</span>
             <span className="detail-value market-value">
-              ${additionalFields.market_value?.toFixed(2) || "0.00"}
+              {additionalFields.market_value ? `$${additionalFields.market_value.toFixed(2)}` : "N/A"}
             </span>
           </div>
         </div>
