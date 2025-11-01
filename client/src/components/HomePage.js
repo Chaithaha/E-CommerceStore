@@ -39,7 +39,7 @@ const HomePage = ({ isDarkMode, setIsDarkMode }) => {
         setError(null);
 
         const API_URL =
-          process.env.REACT_APP_API_URL || "http://localhost:5000";
+          process.env.REACT_APP_API_URL || '${import.meta.env.REACT_APP_API_URL}'
         const url = `${API_URL}/api/items`;
 
         console.log("Fetching products from:", url);
@@ -94,7 +94,7 @@ const HomePage = ({ isDarkMode, setIsDarkMode }) => {
       setLoading(true);
       setError(null);
 
-      const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+      const API_URL = process.env.REACT_APP_API_URL || '${import.meta.env.REACT_APP_API_URL}'
       const response = await fetch(
         `${API_URL}/api/items?search=${encodeURIComponent(searchQuery)}`,
         {
